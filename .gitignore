@@ -83,7 +83,7 @@ sysinfo.txt
 *.dll
 *.exe
 *.exr
-*.fbx
+#*.fbx
 *.jar
 *.java
 *.js
