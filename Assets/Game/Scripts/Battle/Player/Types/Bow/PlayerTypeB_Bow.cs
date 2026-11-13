@@ -90,19 +90,20 @@ namespace MonsterAction.Battle.Player
 
             if (isHolding)
             {
-                if (TryCancelIntoDodge()) return;
-                FaceDirection(GetAttackFacingDirection());
-                if (StateTime >= 0.4f && !holdAnimStarted)
+                if (TryCancelIntoDodge()) return; //回避キャンセル
+                FaceDirection(GetAttackFacingDirection()); //ターゲットに向き続ける
+                if (StateTime >= 0.4f && !holdAnimStarted) //0.4秒経過かつholdAnimStartedじゃなければ
                 {
-                    holdAnimStarted = true;
-                    CrossFade("BowHold");
+                    holdAnimStarted = true; //フラグリセット
+                    CrossFade("BowHold"); //Holdアニメ再生
                 }
-                if (!Input.AttackHeld)
+                if (!Input.AttackHeld) //□ボタン離したら
                 {
-                    if (StateTime >= 0.3) Fire();
+                    if (StateTime >= 0.3) Fire(); //0.3秒以上経過ならファイヤーメソッド！
                 }
+
             }
-            if (StateTime - fireTime >= 0.5f) ReturnToLocomotion();
+            if (StateTime - fireTime >= 0.5f) ReturnToLocomotion(); //撃った後0.5秒以上経過で通常に戻る
         }
 
         // ================================================================
@@ -129,6 +130,7 @@ namespace MonsterAction.Battle.Player
             //        （ステップ7：arrow.Shoot(向き, power * AttackMultiplier, gameObject, flinch);）
 
             isHolding = false;
+            //撃った後の時間計測用(isHoldingでReturnToLocomotionするため)
             fireTime = StateTime;
             CrossFade("BowRelease");
             Debug.Log("発射！");
