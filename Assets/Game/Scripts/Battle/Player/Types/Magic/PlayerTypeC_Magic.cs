@@ -14,10 +14,11 @@ namespace MonsterAction.Battle.Player
         //変数の例）
         //弾の Prefab・ダメージ・撃つまでの時間
         //   ※ MagicBullet.cs を作ってから、// を外してください（先に外すとエラーになります）
-        // [Header("魔法：弾")]
-        // [SerializeField] private MagicBullet bulletPrefab;  // 弾の Prefab
-        // [SerializeField] private float bulletDamage = 12f;  // 弾のダメージ
-        // [SerializeField] private float castTime = 0.3f;     // □ を押してから弾が出るまで（秒）
+
+        [Header("魔法：弾")]
+        [SerializeField] private MagicBullet bulletPrefab;  // 弾の Prefab
+        [SerializeField] private float bulletDamage = 12f;  // 弾のダメージ
+        [SerializeField] private float castTime = 0.3f;     // □ を押してから弾が出るまで（秒）
 
         // TODO（ステップ6）：範囲攻撃の強さ・広さ・エフェクト
         // [Header("魔法：溜め（範囲攻撃）")]
@@ -25,14 +26,15 @@ namespace MonsterAction.Battle.Player
         // [SerializeField] private float burstRadius = 5f;    // 範囲攻撃の半径（m）
         // [SerializeField] private GameObject burstEffect;    // 範囲攻撃のエフェクト（無くてもよい）
 
+
         // 今やっていること（Cast：撃つ / Charge：溜める / Burst：範囲攻撃）… ステップ6で使う
         private enum Step { Cast, Charge, Burst }
 
         // TODO（ステップ4・6）：今の状態を覚えておく変数
         //   ※ 使いはじめたら // を外してください
-        // private bool bulletFired;    // 弾をもう撃ったか（ステップ4）
-        // private Step step;           // 今どの Step か（ステップ6）
-        // private float stepStartTime; // その Step を始めたときの StateTime（ステップ6）
+        private bool bulletFired;    // 弾をもう撃ったか（ステップ4）
+        private Step step;           // 今どの Step か（ステップ6）
+        private float stepStartTime; // その Step を始めたときの StateTime（ステップ6）
 
         protected override void Awake()
         {
@@ -56,8 +58,33 @@ namespace MonsterAction.Battle.Player
             //       5. return true;                                               … 攻撃を始めた
             //   }
             //   ヒント：ステップ1では、BeginAction() と Debug.Log("魔法：□ が押された"); だけで試す
+
+            if (Input.ConsumeAttack())  //□ が押された（1回押すと1回だけ true）
+            {
+                BeginAction();  //攻撃中にする（このあと UpdateAction が毎フレーム呼ばれる）
+                Debug.Log("魔法：□ が押された");
+
+                FaceDirection(GetAttackFacingDirection(), instant: true);
+                // 顔を向ける（集中時：照準、ロックオン：ターゲット）
+
+                CrossFade("Cast");  //Animator のステート切り替え
+
+                bulletFired = false;    // 弾をもう撃ったか？＝まだ
+
+                //ReturnToLocomotion(0.5f);   //攻撃をやめて、普段の移動に戻る(0.5f)後に。
+            }
+
+            //Debug.Log(StateTime);
+            //if (StateTime >= 0.5f)  //StateTime … 攻撃を始めてからの秒数=プレイヤーがBeginActionしてからの時間？
+            //{
+            //    ReturnToLocomotion();   //攻撃をやめて、普段の移動に戻る
+            //}
+
+
             return false; // 何もしなければ false（普段の移動のまま）
         }
+
+
 
         // ================================================================
         //  攻撃中（BeginAction のあと、毎フレーム呼ばれる）
@@ -87,8 +114,29 @@ namespace MonsterAction.Battle.Player
             //       … 回避できる。□ を離したら CrossFade("ChargeCast"); Burst(); ChangeStep(Step.Burst);
             //     else if (step == Step.Burst)
             //       … t が 0.8 秒以上になったら ReturnToLocomotion();
-            ReturnToLocomotion(); // ← 書きはじめたら消す
+            //ReturnToLocomotion(); // ← 書きはじめたら消す
+
+            if (StateTime >= 0.5f) ReturnToLocomotion();    //攻撃開始 StateTimeから0.5秒経ったら、普段の移動に戻る
+            if (TryCancelIntoDodge()) return;   //撃つ前に回避で行動キャンセル
+
+            // 顔を向ける（集中時：照準、ロックオン：ターゲット）
+            FaceDirection(GetAttackFacingDirection(), instant: true);
+            
+            //StateTime が castTime 以上 かつ まだ撃っていない（!bulletFired）なら、1回だけ撃つ
+            if (StateTime >= castTime && !bulletFired)  //攻撃開始 StateTime　□押してから弾が出るcastTime つまり詠唱完了
+            {
+                FireBullet();   //発射スレッド
+                bulletFired = true; //「撃ちました」に切り替え
+            }
+
+            //StateTime が castTime + 0.4f 以上になったら ReturnToLocomotion();
+            if (StateTime >= castTime +0.4f)    //詠唱完了＝発射から0.4f秒経っていたら、
+            {
+                ReturnToLocomotion();   //攻撃モーションをやめて、普段の移動に戻る
+            }
         }
+
+
 
         // ================================================================
         //  自分で作るメソッド
@@ -102,6 +150,10 @@ namespace MonsterAction.Battle.Player
             //   stepStartTime = StateTime;   … いつ始めたかを覚える
             //   bulletFired = false;         … 新しい Step では、まだ撃っていない
         }
+
+
+
+
 
         /// <summary>弾を撃つ（ステップ4・5）</summary>
         private void FireBullet()
@@ -120,7 +172,22 @@ namespace MonsterAction.Battle.Player
             //   3. 弾を作って飛ばす
             //        MagicBullet bullet = Instantiate(bulletPrefab, from, Quaternion.identity);
             //        bullet.Shoot(向き, bulletDamage * AttackMultiplier, gameObject);
+
+
+            //この人(TypeC)の位置 + 高さ*1.3f + 前方 0.5f
+            Vector3 from = transform.position + Vector3.up * 1.3f + transform.forward * 0.5f;
+
+            //★メモ：右手の位置は後の余力で実装する。まずは要素詰込み
+
+
+            GetAimDirection(from);
+
+
         }
+
+
+
+
 
         /// <summary>自分の周りにまとめてダメージ（ステップ6）</summary>
         private void Burst()
@@ -145,6 +212,10 @@ namespace MonsterAction.Battle.Player
             //             Vector3 dir = col.bounds.center - transform.position;  dir.y = 0f;
             //             target.ApplyDamage(new DamageInfo(burstDamage * AttackMultiplier, col.bounds.center, dir.normalized, gameObject));
         }
+
+
+
+
 
         // ================================================================
         //  回避・被弾で攻撃が中断されたとき
