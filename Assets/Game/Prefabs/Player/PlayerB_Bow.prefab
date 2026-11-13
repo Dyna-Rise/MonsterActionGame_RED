@@ -164,6 +164,10 @@ MonoBehaviour:
   getUpDuration: 0.8
   cameraTransform: {fileID: 0}
   animator: {fileID: 0}
+  arrowPrefab: {fileID: 0}
+  damage: 10
+  chargedDamage: 25
+  chargeTime: 1
 --- !u!1001 &5238430837689212627
 PrefabInstance:
   m_ObjectHideFlags: 0

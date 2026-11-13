@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MonsterAction.Battle.Player
 {
-    
+
     public class PlayerTypeB_Bow : PlayerBattleController
     {
         // ================================================================
@@ -12,16 +12,19 @@ namespace MonsterAction.Battle.Player
         //変数の例）
         // 矢の Prefab とダメージを Inspector で設定できるようにする
         //   ※ BowArrow.cs を作ってから、// を外してください（先に外すとエラーになります）
-        // [Header("弓")]
-        // [SerializeField] private BowArrow arrowPrefab;      // 矢の Prefab
-        // [SerializeField] private float damage = 10f;        // ふつうの矢のダメージ
-        // [SerializeField] private float chargedDamage = 25f; // 溜めた矢のダメージ（ステップ7）
-        // [SerializeField] private float chargeTime = 1f;     // この秒数以上 押していたら「溜めた矢」（ステップ7）
+        [Header("弓")]
+        [SerializeField] private BowArrow arrowPrefab;      // 矢の Prefab
+        [SerializeField] private float damage = 10f;        // ふつうの矢のダメージ
+        [SerializeField] private float chargedDamage = 25f; // 溜めた矢のダメージ（ステップ7）
+        [SerializeField] private float chargeTime = 1f;     // この秒数以上 押していたら「溜めた矢」（ステップ7）
 
         // 今の状態を覚えておく変数
-        // private bool isHolding;        // 弓を引いている途中か
-        // private float fireTime;        // 撃ったときの StateTime（撃ったあと何秒たったか調べるため）
-        // private bool holdAnimStarted;  // 「引いたまま」のモーションに切り替えたか
+        private bool isHolding;        // 弓を引いている途中か
+        private float fireTime;        // 撃ったときの StateTime（撃ったあと何秒たったか調べるため）
+        private bool holdAnimStarted;  // 「引いたまま」のモーションに切り替えたか
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        private float holdTime;
 
         protected override void Awake()
         {
@@ -44,6 +47,17 @@ namespace MonsterAction.Battle.Player
             //       5. return true;                                               … 攻撃を始めた
             //   }
             //   ヒント：ステップ1では、BeginAction() と Debug.Log("弓：□ が押された"); だけで試す
+
+            if (Input.ConsumeAttack())
+            {
+                BeginAction();
+                Debug.Log("弓：□ が押された");
+                FaceDirection(GetAttackFacingDirection(), instant: true);
+                CrossFade("BowLoad");
+                isHolding = true;
+                holdAnimStarted = false;
+                return true;
+            }
             return false; // 何もしなければ false（普段の移動のまま）
         }
 
@@ -67,11 +81,28 @@ namespace MonsterAction.Battle.Player
             //       2. FaceDirection(GetAttackFacingDirection()); … 狙う方を向き続ける
             //       3. 0.4 秒たったら、1回だけ CrossFade("BowHold");（holdAnimStarted で1回だけにする）
             //       4. □ を離したら（!Input.AttackHeld）、0.3 秒以上引いていれば Fire();
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //          ステップ7：StateTime >= chargeTime なら強い矢、そうでなければふつうの矢
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //       5. return;
             //   }
             //   撃ったあと：StateTime - fireTime が 0.5 秒以上になったら ReturnToLocomotion();
-            ReturnToLocomotion(); // ← 書きはじめたら消す
+
+            if (isHolding)
+            {
+                if (TryCancelIntoDodge()) return;
+                FaceDirection(GetAttackFacingDirection());
+                if (StateTime >= 0.4f && !holdAnimStarted)
+                {
+                    holdAnimStarted = true;
+                    CrossFade("BowHold");
+                }
+                if (!Input.AttackHeld)
+                {
+                    if (StateTime >= 0.3) Fire();
+                }
+            }
+            if (StateTime - fireTime >= 0.5f) ReturnToLocomotion();
         }
 
         // ================================================================
@@ -86,6 +117,7 @@ namespace MonsterAction.Battle.Player
             //   2. CrossFade("BowRelease");                    … 放つモーション
             //   3. ステップ3では Debug.Log("発射！"); だけで試す
             //
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //   ステップ5 から：矢を出す
             //   4. 矢を出す位置（胸の高さの少し前）
             //        Vector3 from = transform.position + Vector3.up * 1.4f + transform.forward * 0.5f;
@@ -95,6 +127,11 @@ namespace MonsterAction.Battle.Player
             //        BowArrow arrow = Instantiate(arrowPrefab, from, Quaternion.identity);
             //        arrow.Shoot(向き, damage * AttackMultiplier, gameObject);
             //        （ステップ7：arrow.Shoot(向き, power * AttackMultiplier, gameObject, flinch);）
+
+            isHolding = false;
+            fireTime = StateTime;
+            CrossFade("BowRelease");
+            Debug.Log("発射！");
         }
 
         // ================================================================
@@ -105,6 +142,8 @@ namespace MonsterAction.Battle.Player
         {
             // TODO：引いている途中で中断されたら、引くのをやめる
             //   isHolding = false;
+
+            isHolding = false;
         }
     }
 }

@@ -239,6 +239,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1319380445762843580, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 1319380445762843580, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1819913755549224185, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 1819913755549224185, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361456488442240759, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361456488442240759, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3326437749402498311, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 4895648378295599905, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
       propertyPath: player
       value: 
@@ -325,6 +353,38 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6874700723198376188, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929620232845529858, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929620232845529858, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7780723889269848347, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7780723889269848347, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8421581116730166162, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8421581116730166162, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8574420345699927475, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8574420345699927475, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1276,6 +1336,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8794553089965413895, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: m_Positions.Array.data[0].x
+      value: 149.59273
+      objectReference: {fileID: 0}
+    - target: {fileID: 8794553089965413895, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: m_Positions.Array.data[0].z
+      value: 145.92024
+      objectReference: {fileID: 0}
+    - target: {fileID: 8794553089965413895, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: m_Positions.Array.data[1].x
+      value: 149.59273
+      objectReference: {fileID: 0}
+    - target: {fileID: 8794553089965413895, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: m_Positions.Array.data[1].z
+      value: 144.99641
+      objectReference: {fileID: 0}
+    - target: {fileID: 8794553089965413895, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: m_Positions.Array.data[2].x
+      value: 149.59273
+      objectReference: {fileID: 0}
+    - target: {fileID: 8794553089965413895, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: m_Positions.Array.data[2].z
+      value: 144.07257
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1344,7 +1428,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c7604b4434c8ae48bd6aa0d6f793ed0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterAction.Combat.LockOnTarget
-  aimPoint: {fileID: 1856193003}
+  aimPoint: {fileID: 0}
   offset: {x: 0, y: 0.4, z: 0}
   priority: 0
 --- !u!114 &1576917722
