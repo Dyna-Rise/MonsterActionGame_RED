@@ -72,6 +72,16 @@ namespace MonsterAction.Home.UI
             //   ・CreateHeader でスキルの見出しを作る
             //   ・SkillData.All を foreach して、CreateRow() と entries.Add(new Entry { typeIndex = -1, skill = skill })
             //   （typeIndex = -1 で「スキルの行」という意味になります）
+
+            
+            CreateHeader("スキルタイプ");
+           
+            foreach (SkillType skill in SkillData.All)
+                { 
+                CreateRow();                               // 行を1つ作る
+                entries.Add(new Entry { typeIndex = -1 , skill = skill });
+                }
+            
         }
 
         // ================================================================
@@ -95,6 +105,26 @@ namespace MonsterAction.Home.UI
                 }
                 else
                 {
+                    int level = GameData.GetSkillLevel(e.skill);
+
+                    if (level == 0)
+                    {
+                        // 未購入のときの表示
+                        rows[i].Set(name, SkillData.GetStars(0), "未購入", DisabledColor);
+                    }
+                    else
+                    {
+                        // すでに買っているときの表示
+                        //装備中かどうか調べる
+                        bool equipped = GameData.IsSkillEquipped(e.skill);
+                        //       付けている → 右に "装備中"（OnColor）
+                        if (GameData.IsSkillEquipped(e.skill))
+                        { }
+
+                        //       外している → 右に "外している"（OffColor）
+                        else { }
+                    }
+
                     // TODO ③：スキルの行の表示
                     //   ・int level = GameData.GetSkillLevel(e.skill);  で今の★の数（0 なら未購入）
                     //   ・未購入なら … rows[i].Set(名前, SkillData.GetStars(0), "未購入", DisabledColor);
@@ -102,6 +132,7 @@ namespace MonsterAction.Home.UI
                     //       付けている → 右に "装備中"（OnColor）
                     //       外している → 右に "外している"（OffColor）
                     //   ・名前は SkillData.GetName(e.skill)、情報は SkillData.GetStars(level)
+
                 }
             }
         }
@@ -142,6 +173,10 @@ namespace MonsterAction.Home.UI
                 //   1. var t = playerTypes[e.typeIndex];  で選んだタイプを取り出す
                 //   2. GameData.SelectedPlayerTypeId に t.id を入れる
                 //   3. ShowMessage($"{t.displayName} にした");
+
+                var t = playerTypes[e.typeIndex];
+                GameData.SelectedPlayerTypeId = t.id;
+                ShowMessage($"{t.displayName} タイプを選択中");
             }
             else
             {
