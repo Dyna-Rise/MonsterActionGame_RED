@@ -1,3 +1,4 @@
+using TMPro;
 using MonsterAction.Battle.Boss;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,7 @@ namespace MonsterAction.Battle.UI
     {
         [Tooltip("表示 / 非表示を切り替える部分")]
         [SerializeField] private GameObject content;
-        [SerializeField] private Text bossNameText;
+        [SerializeField] private TextMeshProUGUI bossNameText;
         [Tooltip("Image Type = Filled")]
         [SerializeField] private Image hpFill;
         [SerializeField] private float smoothSpeed = 8f;

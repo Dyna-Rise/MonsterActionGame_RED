@@ -1,3 +1,4 @@
+using TMPro;
 using System.Collections.Generic;
 using MonsterAction.Data;
 using MonsterAction.Home.UI;
@@ -21,17 +22,17 @@ namespace MonsterAction.Title
         private enum Screen { Press, Main, NewGame, Continue }
 
         [Header("表示")]
-        [SerializeField] private Text titleText;
+        [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private string gameTitle = "MONSTER ACTION";
         [Tooltip("「PRESS ANY BUTTON」の表示（点滅させる）")]
-        [SerializeField] private Text pressText;
+        [SerializeField] private TextMeshProUGUI pressText;
         [Tooltip("メニュー（一覧・説明）全体。PRESS ANY BUTTON の間は隠す")]
         [SerializeField] private GameObject menuRoot;
-        [SerializeField] private Text headerText;
+        [SerializeField] private TextMeshProUGUI headerText;
         [SerializeField] private RectTransform listRoot;
         [SerializeField] private MenuRow rowTemplate;
-        [SerializeField] private Text descriptionText;
-        [SerializeField] private Text messageText;
+        [SerializeField] private TextMeshProUGUI descriptionText;
+        [SerializeField] private TextMeshProUGUI messageText;
 
         [Header("シーン")]
         [SerializeField] private string homeSceneName = "Home";

@@ -1,3 +1,4 @@
+using TMPro;
 using System;
 using System.Collections.Generic;
 using MonsterAction.Data;
@@ -31,7 +32,7 @@ namespace MonsterAction.Home.UI
         };
 
         [Tooltip("「スキル 1 / 2」のような枠の表示")]
-        [SerializeField] private Text slotText;
+        [SerializeField] private TextMeshProUGUI slotText;
 
         // 行の中身（タイプかスキルのどちらか）
         private struct Entry

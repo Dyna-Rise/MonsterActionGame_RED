@@ -102,5 +102,5 @@ sysinfo.txt
 
 #独自に入れた書式・アセットやレジストリで重いもの
 #それ以外はLFSを活用
-Assets/TextMesh Pro
+#Assets/TextMesh Pro
 UserSettings

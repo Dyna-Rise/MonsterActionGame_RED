@@ -1,3 +1,4 @@
+using TMPro;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,9 +13,9 @@ namespace MonsterAction.Home.UI
     [RequireComponent(typeof(Button))]
     public class MenuRow : MonoBehaviour, ISelectHandler, IPointerEnterHandler
     {
-        [SerializeField] private Text nameText;
-        [SerializeField] private Text infoText;
-        [SerializeField] private Text rightText;
+        [SerializeField] private TextMeshProUGUI nameText;
+        [SerializeField] private TextMeshProUGUI infoText;
+        [SerializeField] private TextMeshProUGUI rightText;
 
         private Button button;
 

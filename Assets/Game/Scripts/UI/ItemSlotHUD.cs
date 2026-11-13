@@ -1,3 +1,4 @@
+using TMPro;
 using MonsterAction.Battle.Player;
 using MonsterAction.Data;
 using UnityEngine;
@@ -12,8 +13,8 @@ namespace MonsterAction.Battle.UI
     public class ItemSlotHUD : MonoBehaviour
     {
         [SerializeField] private Image icon;
-        [SerializeField] private Text nameText;
-        [SerializeField] private Text countText;
+        [SerializeField] private TextMeshProUGUI nameText;
+        [SerializeField] private TextMeshProUGUI countText;
         [Tooltip("残り 0 のときに暗くする部分")]
         [SerializeField] private CanvasGroup group;
         [SerializeField] private float emptyAlpha = 0.4f;

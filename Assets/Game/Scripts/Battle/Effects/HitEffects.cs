@@ -3,6 +3,7 @@ using MonsterAction.Battle.Boss;
 using MonsterAction.Battle.CameraSystem;
 using MonsterAction.Battle.Player;
 using MonsterAction.Combat;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +18,7 @@ namespace MonsterAction.Battle.Effects
     ///
     /// プレイヤー / ボスのイベント（Damaged / Guarded）を聞いているだけなので、
     /// 攻撃する側のスクリプトは何もしなくてよい。
-    /// 見た目はプリミティブ（立方体・球）と UI の Text で作っているので、後でパーティクル等に差し替え可能。
+    /// 見た目はプリミティブ（立方体・球）と UI の TextMeshProUGUI で作っているので、後でパーティクル等に差し替え可能。
     /// </summary>
     public class HitEffects : MonoBehaviour
     {
@@ -47,7 +48,6 @@ namespace MonsterAction.Battle.Effects
         private BattleCameraController cameraController;
         private Canvas canvas;
         private Image flash;
-        private Font font;
         private int guardedFrame = -1;
         private bool inHitStop;
 
@@ -57,7 +57,6 @@ namespace MonsterAction.Battle.Effects
 
         private void Start()
         {
-            font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             CreateOverlay();
         }
 
@@ -228,19 +227,20 @@ namespace MonsterAction.Battle.Effects
         private void SpawnNumber(Vector3 worldPos, int value, Color color, int fontSize)
         {
             if (canvas == null) return;
-            var go = new GameObject("DamageNumber", typeof(RectTransform), typeof(Text), typeof(Outline));
+            var go = new GameObject("DamageNumber", typeof(RectTransform), typeof(TextMeshProUGUI));
             go.transform.SetParent(canvas.transform, false);
-            var text = go.GetComponent<Text>();
-            text.font = font;
+            var text = go.GetComponent<TextMeshProUGUI>();
             text.fontSize = fontSize;
-            text.fontStyle = FontStyle.Bold;
-            text.alignment = TextAnchor.MiddleCenter;
-            text.horizontalOverflow = HorizontalWrapMode.Overflow;
-            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.fontStyle = FontStyles.Bold;
+            text.alignment = TextAlignmentOptions.Center;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
+            text.overflowMode = TextOverflowModes.Overflow;
             text.raycastTarget = false;
             text.color = color;
             text.text = value.ToString();
-            go.GetComponent<Outline>().effectColor = new Color(0f, 0f, 0f, 0.8f);
+            // 縁取り（旧 Outline コンポーネントの代わり）
+            text.outlineWidth = 0.25f;
+            text.outlineColor = new Color(0f, 0f, 0f, 0.8f);
             go.AddComponent<DamageNumber>().Play(worldPos + Random.insideUnitSphere * 0.3f, (RectTransform)canvas.transform);
         }
 
@@ -250,14 +250,14 @@ namespace MonsterAction.Battle.Effects
             private const float LifeTime = 0.8f;
             private Vector3 worldPos;
             private RectTransform canvasRect;
-            private Text text;
+            private TextMeshProUGUI text;
             private float age;
 
             public void Play(Vector3 position, RectTransform canvas)
             {
                 worldPos = position;
                 canvasRect = canvas;
-                text = GetComponent<Text>();
+                text = GetComponent<TextMeshProUGUI>();
                 Update();
             }
 
