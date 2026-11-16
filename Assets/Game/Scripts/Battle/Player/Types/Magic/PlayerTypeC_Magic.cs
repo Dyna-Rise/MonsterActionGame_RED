@@ -395,6 +395,8 @@ namespace MonsterAction.Battle.Player
             //        ・ダメージを与える
             //             Vector3 dir = col.bounds.center - transform.position;  dir.y = 0f;
             //             target.ApplyDamage(new DamageInfo(burstDamage * AttackMultiplier, col.bounds.center, dir.normalized, gameObject));
+
+
             foreach (Collider col in hits)
             {
                 if (col.transform.IsChildOf(transform)) continue;
