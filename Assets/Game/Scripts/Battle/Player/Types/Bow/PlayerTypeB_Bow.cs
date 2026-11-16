@@ -99,9 +99,13 @@ namespace MonsterAction.Battle.Player
                 }
                 if (!Input.AttackHeld) //□ボタン離したら
                 {
-                    if (StateTime >= 0.3) Fire(); //0.3秒以上経過ならファイヤーメソッド！
+                    if (StateTime >= 0.3)
+                    {
+                        Fire(); //0.3秒以上経過ならファイヤーメソッド！
+                    }
+                    else ReturnToLocomotion(); //未満なら通常へ戻る
                 }
-
+                return; //Hold中に▼ifなるの防止
             }
             if (StateTime - fireTime >= 0.5f) ReturnToLocomotion(); //撃った後0.5秒以上経過で通常に戻る
         }
@@ -118,10 +122,10 @@ namespace MonsterAction.Battle.Player
             //   2. CrossFade("BowRelease");                    … 放つモーション
             //   3. ステップ3では Debug.Log("発射！"); だけで試す
             //
-            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //   ステップ5 から：矢を出す
             //   4. 矢を出す位置（胸の高さの少し前）
             //        Vector3 from = transform.position + Vector3.up * 1.4f + transform.forward * 0.5f;
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //   5. 飛ばす向き：ふつうは正面 transform.forward
             //        ステップ6：IsFocusing なら GetAimDirection(from)
             //   6. 矢を作って飛ばす
@@ -129,10 +133,19 @@ namespace MonsterAction.Battle.Player
             //        arrow.Shoot(向き, damage * AttackMultiplier, gameObject);
             //        （ステップ7：arrow.Shoot(向き, power * AttackMultiplier, gameObject, flinch);）
 
-            isHolding = false;
-            //撃った後の時間計測用(isHoldingでReturnToLocomotionするため)
+            Vector3 from = transform.position + Vector3.up * 1.4f + transform.forward * 0.5f;
+            //決めた位置に矢を生成
+            BowArrow arrow = Instantiate(arrowPrefab, from, Quaternion.identity);
+            //矢飛ばす:BowArrow.csのShootメソッド発動→引数は(方向,ダメージ量,発射元(自分自身))
+            arrow.Shoot(transform.forward, damage * AttackMultiplier, gameObject);
+            //飛ばす向きの条件付け
+            if (IsFocusing) transform.forward = GetAimDirection(from);
+
+
+            isHolding = false; //フラグリセット
+            //撃った後の時間計測用(isHolding後にReturnToLocomotionするため)
             fireTime = StateTime;
-            CrossFade("BowRelease");
+            CrossFade("BowRelease"); //Releaseアニメ再生
             Debug.Log("発射！");
         }
 

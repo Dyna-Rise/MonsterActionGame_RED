@@ -1285,6 +1285,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 917811258}
     - target: {fileID: 6576552724650268553, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: arrowPrefab
+      value: 
+      objectReference: {fileID: -7806372544992149946, guid: 31a32d4e0b02b394da299e7d683dbf53, type: 3}
+    - target: {fileID: 6576552724650268553, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
       propertyPath: cameraTransform
       value: 
       objectReference: {fileID: 961739753}
