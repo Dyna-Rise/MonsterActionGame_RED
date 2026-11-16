@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using MonsterAction.Combat;
 using UnityEngine;
 
@@ -16,9 +15,13 @@ namespace MonsterAction.Battle.Player
         //   ※ MagicBullet.cs を作ってから、// を外してください（先に外すとエラーになります）
 
         [Header("魔法：弾")]
+        //public GameObject bulletPrefub; //下の1行を置き換えてみた。後で必要なら
         [SerializeField] private MagicBullet bulletPrefab;  // 弾の Prefab
         [SerializeField] private float bulletDamage = 12f;  // 弾のダメージ
         [SerializeField] private float castTime = 0.3f;     // □ を押してから弾が出るまで（秒）
+
+        //public float shootInterval = 0.5f;    //使うかな？
+
 
         // TODO（ステップ6）：範囲攻撃の強さ・広さ・エフェクト
         // [Header("魔法：溜め（範囲攻撃）")]
@@ -33,6 +36,9 @@ namespace MonsterAction.Battle.Player
         // TODO（ステップ4・6）：今の状態を覚えておく変数
         //   ※ 使いはじめたら // を外してください
         private bool bulletFired;    // 弾をもう撃ったか（ステップ4）
+
+        //Coroutine magicStart;   //魔法を撃っているかどうかを知るためのコルーチン型の変数。弾、範囲両Stepあるので要らないかな
+
         private Step step;           // 今どの Step か（ステップ6）
         private float stepStartTime; // その Step を始めたときの StateTime（ステップ6）
 
@@ -62,7 +68,7 @@ namespace MonsterAction.Battle.Player
             if (Input.ConsumeAttack())  //□ が押された（1回押すと1回だけ true）
             {
                 BeginAction();  //攻撃中にする（このあと UpdateAction が毎フレーム呼ばれる）
-                Debug.Log("魔法：□ が押された");
+                //Debug.Log("魔法：□ が押された");
 
                 FaceDirection(GetAttackFacingDirection(), instant: true);
                 // 顔を向ける（集中時：照準、ロックオン：ターゲット）
@@ -133,6 +139,7 @@ namespace MonsterAction.Battle.Player
             if (StateTime >= castTime +0.4f)    //詠唱完了＝発射から0.4f秒経っていたら、
             {
                 ReturnToLocomotion();   //攻撃モーションをやめて、普段の移動に戻る
+                bulletFired = false;    //念のため、弾を撃っていない状態に戻しておく
             }
         }
 
@@ -174,20 +181,34 @@ namespace MonsterAction.Battle.Player
             //        bullet.Shoot(向き, bulletDamage * AttackMultiplier, gameObject);
 
 
+
+            //飛ばす向き：ふつうは正面 transform.forward
+            //if(IsFocusing なら
+            //{
+            //    GetAimDirection(from);  //発射方向
+            //}
+
             //この人(TypeC)の位置 + 高さ*1.3f + 前方 0.5f
-            Vector3 from = transform.position + Vector3.up * 1.3f + transform.forward * 0.5f;
+            Vector3 from = 
+                (transform.position) + 
+                (Vector3.up * 1.3f) + 
+                (transform.forward * 0.5f);
 
-            //★メモ：右手の位置は後の余力で実装する。まずは要素詰込み
+            //★メモ：手の位置は後の余力で実装する。まずは要素を詰込み
+
+            //Rigidbody bulletbody = bulletPrefab.GetComponent<Rigidbody>();
+            //bulletbody.AddForce(Vector3.forward);
 
 
-            GetAimDirection(from);
+            //魔法を飛ばすのは MagicBullet.cs
+            MagicBullet bullet = Instantiate(bulletPrefab, from, Quaternion.identity);
+            //プレハブコピって、fromの位置、回転なし
 
+            //MagicBullet.csのShoot()に、位置とダメージ、魔法弾プレハブを伝える
+            //bullet.Shoot(from, bulletDamage * AttackMultiplier, gameObject);
+            bullet.Shoot(transform.forward, bulletDamage * AttackMultiplier);
 
         }
-
-
-
-
 
         /// <summary>自分の周りにまとめてダメージ（ステップ6）</summary>
         private void Burst()
