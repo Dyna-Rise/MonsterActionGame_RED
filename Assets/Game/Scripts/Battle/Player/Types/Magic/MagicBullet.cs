@@ -1,5 +1,7 @@
+using MonsterAction.Combat;
 using MonsterAction.Data;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MagicBullet : MonoBehaviour

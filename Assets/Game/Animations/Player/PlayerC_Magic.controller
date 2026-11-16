@@ -459,8 +459,8 @@ AnimatorState:
   m_Tag: 
   m_SpeedParameter: ActionSpeed
   m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_CycleOffsetParameter: Speed
+  m_TimeParameter: Speed
 --- !u!1107 &6092826480158797378
 AnimatorStateMachine:
   serializedVersion: 6

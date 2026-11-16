@@ -1,4 +1,5 @@
 using MonsterAction.Combat;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MonsterAction.Battle.Player
@@ -6,6 +7,10 @@ namespace MonsterAction.Battle.Player
    
     public class PlayerTypeC_Magic : PlayerBattleController
     {
+        // 今やっていること（Cast：撃つ / Charge：溜める / Burst：範囲攻撃）… ステップ6で使う
+        //private enum Step { Cast, Charge, Burst }
+        private enum Step { Locomotion, Cast, Charge, Burst }
+
         // ================================================================
         //  Inspector で設定するもの・覚えておく変数
         // ================================================================
@@ -20,18 +25,15 @@ namespace MonsterAction.Battle.Player
         [SerializeField] private float bulletDamage = 12f;  // 弾のダメージ
         [SerializeField] private float castTime = 0.3f;     // □ を押してから弾が出るまで（秒）
 
-        //public float shootInterval = 0.5f;    //使うかな？
+        //public float shootInterval = 0.5f;    //使うかな？stepあるから要らないね
 
 
         // TODO（ステップ6）：範囲攻撃の強さ・広さ・エフェクト
-        // [Header("魔法：溜め（範囲攻撃）")]
-        // [SerializeField] private float burstDamage = 30f;   // 範囲攻撃のダメージ
-        // [SerializeField] private float burstRadius = 5f;    // 範囲攻撃の半径（m）
-        // [SerializeField] private GameObject burstEffect;    // 範囲攻撃のエフェクト（無くてもよい）
+        [Header("魔法：溜め（範囲攻撃）")]
+        [SerializeField] private float burstDamage = 30f;   // 範囲攻撃のダメージ
+        [SerializeField] private float burstRadius = 5f;    // 範囲攻撃の半径（m）
+        [SerializeField] private GameObject burstEffect;    // 範囲攻撃のエフェクト（無くてもよい）←とのことなので、余力で
 
-
-        // 今やっていること（Cast：撃つ / Charge：溜める / Burst：範囲攻撃）… ステップ6で使う
-        private enum Step { Cast, Charge, Burst }
 
         // TODO（ステップ4・6）：今の状態を覚えておく変数
         //   ※ 使いはじめたら // を外してください
@@ -47,11 +49,15 @@ namespace MonsterAction.Battle.Player
             base.Awake();   // ← これが無いと Input などが null のまま（消さない）
         }
 
+
+
+
+
         // ================================================================
         //  攻撃を始める（普段の移動中に、毎フレーム呼ばれる）
         // ================================================================
 
-        protected override bool TryStartAction()
+        protected override bool TryStartAction()    //普段の移動中に、毎フレーム呼ばれる
         {
             // TODO：□ が押されたら、詠唱を始める
             //   if (Input.ConsumeAttack())
@@ -65,10 +71,10 @@ namespace MonsterAction.Battle.Player
             //   }
             //   ヒント：ステップ1では、BeginAction() と Debug.Log("魔法：□ が押された"); だけで試す
 
-            if (Input.ConsumeAttack())  //□ が押された（1回押すと1回だけ true）
+            if (step == Step.Locomotion && Input.ConsumeAttack()) //□ が押された（1回押すと1回だけ true）
             {
                 BeginAction();  //攻撃中にする（このあと UpdateAction が毎フレーム呼ばれる）
-                //Debug.Log("魔法：□ が押された");
+                Debug.Log("魔法：□ が押された");
 
                 FaceDirection(GetAttackFacingDirection(), instant: true);
                 // 顔を向ける（集中時：照準、ロックオン：ターゲット）
@@ -77,14 +83,20 @@ namespace MonsterAction.Battle.Player
 
                 bulletFired = false;    // 弾をもう撃ったか？＝まだ
 
+                ChangeStep(Step.Cast); //ステップを詠唱開始にする
+
+
                 //ReturnToLocomotion(0.5f);   //攻撃をやめて、普段の移動に戻る(0.5f)後に。
             }
 
+
             //Debug.Log(StateTime);
-            //if (StateTime >= 0.5f)  //StateTime … 攻撃を始めてからの秒数=プレイヤーがBeginActionしてからの時間？
-            //{
-            //    ReturnToLocomotion();   //攻撃をやめて、普段の移動に戻る
-            //}
+            if (StateTime >= 0.5f)  //StateTime … 攻撃を始めてからの秒数=プレイヤーがBeginActionしてからの時間？
+            {
+                ReturnToLocomotion();   //攻撃をやめて、普段の移動に戻る
+                bulletFired = false;    //念のため、弾を撃っていない状態に戻しておく
+                ChangeStep(Step.Locomotion); //ステップを移動にリセット
+            }
 
 
             return false; // 何もしなければ false（普段の移動のまま）
@@ -96,7 +108,7 @@ namespace MonsterAction.Battle.Player
         //  攻撃中（BeginAction のあと、毎フレーム呼ばれる）
         // ================================================================
 
-        protected override void UpdateAction(float deltaTime)
+        protected override void UpdateAction(float deltaTime)   //BeginAction のあと、毎フレーム呼ばれる
         {
             // TODO：撃つ（または溜める）→ 少し待って戻る
             //   ★ 書きはじめたら、いちばん下の ReturnToLocomotion(); は消す
@@ -122,25 +134,96 @@ namespace MonsterAction.Battle.Player
             //       … t が 0.8 秒以上になったら ReturnToLocomotion();
             //ReturnToLocomotion(); // ← 書きはじめたら消す
 
-            if (StateTime >= 0.5f) ReturnToLocomotion();    //攻撃開始 StateTimeから0.5秒経ったら、普段の移動に戻る
+            if (StateTime >= 0.5f)
+            {
+                ReturnToLocomotion();    //攻撃開始 StateTimeから0.5秒経ったら、普段の移動に戻る
+                bulletFired = false;    //念のため、弾を撃っていない状態に戻しておく
+                ChangeStep(Step.Locomotion); //ステップを移動にリセット
+
+            }
             if (TryCancelIntoDodge()) return;   //撃つ前に回避で行動キャンセル
 
             // 顔を向ける（集中時：照準、ロックオン：ターゲット）
             FaceDirection(GetAttackFacingDirection(), instant: true);
-            
-            //StateTime が castTime 以上 かつ まだ撃っていない（!bulletFired）なら、1回だけ撃つ
-            if (StateTime >= castTime && !bulletFired)  //攻撃開始 StateTime　□押してから弾が出るcastTime つまり詠唱完了
-            {
-                FireBullet();   //発射スレッド
-                bulletFired = true; //「撃ちました」に切り替え
-            }
 
+            /*
             //StateTime が castTime + 0.4f 以上になったら ReturnToLocomotion();
             if (StateTime >= castTime +0.4f)    //詠唱完了＝発射から0.4f秒経っていたら、
             {
                 ReturnToLocomotion();   //攻撃モーションをやめて、普段の移動に戻る
                 bulletFired = false;    //念のため、弾を撃っていない状態に戻しておく
+                step = Step.Locomotion; //ステップを移動にリセット
             }
+            */
+
+            /*  途中までifで書いていたけどswitchに書き換えちゃった
+            //   ステップ6：Step で分ける（float t = StateTime - stepStartTime; が「今の Step の秒数」）
+            if (step == Step.Cast)  //現在のステップがキャスト（詠唱中）なら、
+            {
+                if (StateTime >= castTime)  //詠唱開始から、詠唱時間を超えていたなら、
+                {
+                    if (Input.ConsumeAttack())  //□ボタンが押されていたら
+                    {
+                        Debug.Log("□ 長押し");
+
+                        CrossFade("ChargeLoad");    //チャージロードのアニメに切り替え
+                        ChangeStep(Step.Charge);    //ステップをチャージに変更
+                        return;
+                    }
+                    else
+                    {
+                        //StateTime が castTime 以上 かつ まだ撃っていない（!bulletFired）なら、1回だけ撃つ
+                        if (StateTime >= castTime && !bulletFired)  //攻撃開始 StateTime　□押してから弾が出るcastTime つまり詠唱完了
+                        {
+                            FireBullet();   //発射スレッド
+                            bulletFired = true; //「撃ちました」に切り替え
+                            return;
+                        }
+                    }
+                }
+            }
+            */
+
+
+            //   ステップ6：Step で分ける（float t = StateTime - stepStartTime; が「今の Step の秒数」）
+            float t = StateTime - stepStartTime; //今の Step の秒数
+
+            //if (Input.AttackHeld) chargeTime += Time.deltaTime;
+            //if (Input.AttackReleasedThisFrame)
+            //{
+            //    if (chargeTime >= chargeThreshold) FireChargedMagic();
+            //    chargeTime = 0f;
+            //}
+
+            switch (step)
+            {
+                case Step.Cast:     //現在のステップがキャスト（詠唱中）なら、
+                    StepCast();
+                    break;
+                case Step.Charge:   //現在のステップがチャージなら
+                    //StepCharge();
+                    CrossFade("ChargeCast"); 
+                    Burst(); 
+                    ChangeStep(Step.Burst);
+                    break;
+                case Step.Burst:
+                    if (t >= 0.8f)  //0.8秒以上
+                    {
+                        ReturnToLocomotion();   //攻撃モーションをやめて、普段の移動に戻る
+                        bulletFired = false;    //念のため、弾を撃っていない状態に戻しておく
+                        ChangeStep(Step.Locomotion); //ステップを移動にリセット
+                    }
+                    break;
+            }
+
+            //       … castTime の時点で □ を押し続けていたら CrossFade("ChargeLoad"); ChangeStep(Step.Charge); return;
+            //       … 離していたら、ステップ4と同じく弾を撃つ
+            //     else if (step == Step.Charge)
+            //       … 回避できる。□ を離したら CrossFade("ChargeCast"); Burst(); ChangeStep(Step.Burst);
+            //     else if (step == Step.Burst)
+            //       … t が 0.8 秒以上になったら ReturnToLocomotion();
+
+
         }
 
 
@@ -153,13 +236,61 @@ namespace MonsterAction.Battle.Player
         private void ChangeStep(Step next)
         {
             // TODO：
-            //   step = next;                 … 今の Step を変える
-            //   stepStartTime = StateTime;   … いつ始めたかを覚える
-            //   bulletFired = false;         … 新しい Step では、まだ撃っていない
+            step = next;                 //… 今の Step を変える
+            stepStartTime = StateTime;   //… いつ始めたかを覚える
+            bulletFired = false;         //… 新しい Step では、まだ撃っていない
+
+            Debug.Log($"ステップ:{step}");
         }
 
 
+        private void StepCast()
+        {
+            Debug.Log($"StepCast");
 
+            float t = StateTime - stepStartTime; //今の Step の秒数
+
+            if (t >= castTime)  //詠唱開始から、詠唱時間を超えていたなら、
+            {
+
+                if (Input.AttackHeld)  //□ボタンが押されていたら
+                {
+                    //Debug.Log("□ 長押し");
+
+                    CrossFade("ChargeLoad");    //チャージロードのアニメに切り替え
+                    ChangeStep(Step.Charge);    //ステップをチャージに変更
+
+                    return;
+                }
+                //StateTime が castTime 以上 かつ まだ撃っていない（!bulletFired）なら、1回だけ撃つ
+                //攻撃開始 StateTime　□押してから弾が出るcastTime つまり詠唱完了
+                else if (t >= castTime && !bulletFired)
+                {
+                    FireBullet();   //発射スレッド
+                    bulletFired = true; //「撃ちました」に切り替え
+                    return;
+                }
+            }
+        }
+        private void StepCharge() 
+        {
+            float t = StateTime - stepStartTime; //今の Step の秒数
+
+            if (Input.AttackHeld)  //□ボタンが押されていたら
+            {
+                Debug.Log($"チャージ時間:{t}");
+                return; //チャージ継続
+            }
+            else if (Input.AttackReleasedThisFrame)  //離した
+            {
+                if (t >= castTime)  //0.4秒以上押してから離した
+                {
+                    //CrossFade("ChargeCast");    //アニメ切り替え
+                    Burst();
+                    ChangeStep(Step.Burst);
+                }
+            }
+        }
 
 
         /// <summary>弾を撃つ（ステップ4・5）</summary>
@@ -182,31 +313,30 @@ namespace MonsterAction.Battle.Player
 
 
 
-            //飛ばす向き：ふつうは正面 transform.forward
-            //if(IsFocusing なら
-            //{
-            //    GetAimDirection(from);  //発射方向
-            //}
-
+            //FaceDirection(GetAttackFacingDirection(), instant: true);
             //この人(TypeC)の位置 + 高さ*1.3f + 前方 0.5f
             Vector3 from = 
                 (transform.position) + 
                 (Vector3.up * 1.3f) + 
                 (transform.forward * 0.5f);
 
-            //★メモ：手の位置は後の余力で実装する。まずは要素を詰込み
+            //飛ばす向き：ふつうは正面 transform.forward
+            if (IsFocusing)  //集中は方向を
+            {
+                GetAimDirection(from);  //発射方向
+            }
 
-            //Rigidbody bulletbody = bulletPrefab.GetComponent<Rigidbody>();
-            //bulletbody.AddForce(Vector3.forward);
+
+            //★メモ：手の位置は後の余力で実装する。まずは要素を詰込み
 
 
             //魔法を飛ばすのは MagicBullet.cs
             MagicBullet bullet = Instantiate(bulletPrefab, from, Quaternion.identity);
-            //プレハブコピって、fromの位置、回転なし
+            //プレハブを、fromの位置に、回転なしでコピって表示
 
             //MagicBullet.csのShoot()に、位置とダメージ、魔法弾プレハブを伝える
             //bullet.Shoot(from, bulletDamage * AttackMultiplier, gameObject);
-            bullet.Shoot(transform.forward, bulletDamage * AttackMultiplier);
+            bullet.Shoot(transform.forward, bulletDamage * AttackMultiplier);  //gameObjectは消した
 
         }
 
@@ -232,6 +362,59 @@ namespace MonsterAction.Battle.Player
             //        ・ダメージを与える
             //             Vector3 dir = col.bounds.center - transform.position;  dir.y = 0f;
             //             target.ApplyDamage(new DamageInfo(burstDamage * AttackMultiplier, col.bounds.center, dir.normalized, gameObject));
+
+            //   1. エフェクトがあれば　お出して、3 秒後に消す
+            if (burstEffect != null) 
+            {
+                GameObject fx = Instantiate(burstEffect, transform.position, Quaternion.identity); 
+                Destroy(fx, 3f); 
+            }
+
+            //   2. 周りの Collider を全部集める
+            Collider[] hits = Physics.OverlapSphere(
+                transform.position + Vector3.up, //こいつの場所を中心に、
+                burstRadius,                     //攻撃範囲(5.0f)
+                ~0,                              //←すべてのレイヤーという意味らしい
+                QueryTriggerInteraction.Collide  //IsTriggerも含む
+                );
+
+            //   3. 同じボスに何回も当てないためのリスト
+            List<IDamageable> alreadyHit = new List<IDamageable>();
+
+
+
+            //   4. foreach (Collider col in hits) で1つずつ
+            //        ・自分の体なら飛ばす               if (col.transform.IsChildOf(transform)) continue;
+            //        ・ダメージを受けられる相手か       IDamageable target = col.GetComponentInParent<IDamageable>();
+            //                                           if (target == null || !target.IsAlive) continue;
+            //        ・ボスの部位（頭・しっぽなど）なら、持ち主のボスで「当てたか」を数える
+            //             IDamageable boss = target;
+            //             if (target is IDamagePart part) boss = part.Owner;
+            //             if (alreadyHit.Contains(boss)) continue;
+            //             alreadyHit.Add(boss);
+            //        ・ダメージを与える
+            //             Vector3 dir = col.bounds.center - transform.position;  dir.y = 0f;
+            //             target.ApplyDamage(new DamageInfo(burstDamage * AttackMultiplier, col.bounds.center, dir.normalized, gameObject));
+            foreach (Collider col in hits)
+            {
+                if (col.transform.IsChildOf(transform)) continue;
+                //自分(Player)と、その子(Playerのパーツ)の体なら、飛ばす（＝foreach終了する）
+
+                //ダメージを受けられる相手か
+                IDamageable target = col.GetComponentInParent<IDamageable>();
+                if (target == null || !target.IsAlive) continue;
+                //ターゲットがnullあるいは生きていないなら、foreach終了
+
+                //ボスの部位（頭・しっぽなど）なら、持ち主のボスで「当てたか」を数える
+                IDamageable boss = target;
+                if (target is IDamagePart part) boss = part.Owner;
+                if (alreadyHit.Contains(boss)) continue;
+                alreadyHit.Add(boss);
+
+                //敵にダメージを与える
+                Vector3 dir = col.bounds.center - transform.position; dir.y = 0f;
+                target.ApplyDamage(new DamageInfo(burstDamage * AttackMultiplier, col.bounds.center, dir.normalized, gameObject));
+            }
         }
 
 
