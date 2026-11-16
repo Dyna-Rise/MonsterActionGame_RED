@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MonsterAction.Home.UI
 {
-    
+
     public class ShopMenu : HomeMenuBase
     {
         private static readonly Color PriceColor = new Color(1f, 0.85f, 0.3f);
@@ -82,6 +82,16 @@ namespace MonsterAction.Home.UI
                     //                そうでなければ FormatMoney(GameData.GetNextSkillPrice(e.skill))
                     //   ・右の色  … 売り切れなら DisabledColor、そうでなければ PriceColor
                     //   rows[i].Set(名前, 情報, 右の文字, 右の色); で表示します（上のアイテムが参考になります）
+
+                    int level = GameData.GetSkillLevel(e.skill);
+                    bool isMax = GameData.IsSkillMaxed(e.skill);
+
+                    rows[i].Set(
+                        SkillData.GetName(e.skill),
+                        SkillData.GetStars(level),
+                        isMax ? "売切れ" : FormatMoney(GameData.GetNextSkillPrice(e.skill)),
+                        isMax ? DisabledColor : PriceColor
+                    );
                 }
             }
         }
@@ -104,6 +114,8 @@ namespace MonsterAction.Home.UI
                 // TODO ④：スキルの説明を出す
                 //   SkillData.GetDescription(e.skill) を SetDescription に渡す
                 //   （「装備画面（ドア）で付けると効果が出ます。」と付け足すと親切）
+
+                SetDescription(SkillData.GetDescription(e.skill) + "\n装備画面（ドア）で付けると効果が出ます。");
             }
         }
 
