@@ -119,15 +119,16 @@ namespace MonsterAction.Home.UI
                         // すでに買っているときの表示
                         //装備中かどうか調べる
                         //       付けている → 右に "装備中"（OnColor）
+                        var name = SkillData.GetName(e.skill);
                         bool equipped = GameData.IsSkillEquipped(e.skill);
                         if (equipped)
                         {
-                            rows[i].Set(name, SkillData.GetStars(0), "装備中", OnColor);
+                            rows[i].Set(name, SkillData.GetStars(level), "装備中", OnColor);
                         }
                         //       外している → 右に "外している"（OffColor）
                         else
                         {
-                            rows[i].Set(name, SkillData.GetStars(0), "外している", OffColor);
+                            rows[i].Set(name, SkillData.GetStars(level), "装備していません", OffColor);
                         }
                     }
 
@@ -162,7 +163,7 @@ namespace MonsterAction.Home.UI
 
                 if (level == 0)
                 {
-                    ShowMessage("村人のショップで買えます。");
+                    SetDescription(SkillData.GetDescription(e.skill)+ "\n（村人のショップで買えます。）");
                 }
                 else
                 {
@@ -187,18 +188,17 @@ namespace MonsterAction.Home.UI
 
             if (e.IsType)
             {
+                var t = playerTypes[e.typeIndex];
+                GameData.SelectedPlayerTypeId = t.id;
+                ShowMessage($"{t.displayName} タイプを選択中");
+
                 // TODO ①：そのタイプにする
                 //   1. var t = playerTypes[e.typeIndex];  で選んだタイプを取り出す
                 //   2. GameData.SelectedPlayerTypeId に t.id を入れる
                 //   3. ShowMessage($"{t.displayName} にした");
-
-                var t = playerTypes[e.typeIndex];
-                GameData.SelectedPlayerTypeId = t.id;
-                ShowMessage($"{t.displayName} タイプを選択中");
             }
             else
             {
-                ////////作業中
                 int level = GameData.GetSkillLevel(e.skill);
 
                 //1.未購入（GameData.GetSkillLevel が 0 以下）なら … "まだ買っていません"
@@ -210,10 +210,9 @@ namespace MonsterAction.Home.UI
                 //   2. 付けていれば外す、外していれば付ける（GameData.SetSkillEquipped）
                 else
                 {
-                   
-                  bool nextState = !GameData.IsSkillEquipped(e.skill); // trueならfalseに、falseならtrueになる
+                    bool nextState = !GameData.IsSkillEquipped(e.skill); // trueならfalseに、falseならtrueになる
 
-                    
+
                     if (!GameData.SetSkillEquipped(e.skill, nextState))
                     {
                         // 失敗した時のメッセージを出す

@@ -13761,6 +13761,10 @@ PrefabInstance:
       value: EquipmentMenu
       objectReference: {fileID: 0}
     - target: {fileID: 4050221307841936732, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_TextWrappingMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4050221307841936732, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
