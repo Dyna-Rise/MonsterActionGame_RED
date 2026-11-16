@@ -2497,6 +2497,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 310300393863586916, guid: 75e397e80c58d2b44875e328da1c8404, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 310300393863586916, guid: 75e397e80c58d2b44875e328da1c8404, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4967897965946466672, guid: 75e397e80c58d2b44875e328da1c8404, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -2577,6 +2585,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6232498890815262388, guid: 75e397e80c58d2b44875e328da1c8404, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8170932336339302993, guid: 75e397e80c58d2b44875e328da1c8404, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8170932336339302993, guid: 75e397e80c58d2b44875e328da1c8404, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8801444145068292394, guid: 75e397e80c58d2b44875e328da1c8404, type: 3}
       propertyPath: m_Name
       value: HomeHUD
@@ -2584,6 +2604,14 @@ PrefabInstance:
     - target: {fileID: 8801444145068292394, guid: 75e397e80c58d2b44875e328da1c8404, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9182647267662173153, guid: 75e397e80c58d2b44875e328da1c8404, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 9182647267662173153, guid: 75e397e80c58d2b44875e328da1c8404, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13720,9 +13748,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 795046491463339231, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 795046491463339231, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3859695710868805086, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
       propertyPath: m_Name
       value: EquipmentMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 4050221307841936732, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 4050221307841936732, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4481966012267417493, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
       propertyPath: m_IsActive
@@ -13806,6 +13850,50 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5516246124738082722, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6081028012336352814, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 6081028012336352814, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7712332880111772013, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7712332880111772013, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7752270880614773518, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7752270880614773518, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8080545965136799617, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8538544328276324865, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8538544328276324865, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8868917435116120840, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8868917435116120840, guid: e900efa4b3f694845a9d7768f65508d3, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

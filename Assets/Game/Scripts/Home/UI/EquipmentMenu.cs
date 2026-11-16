@@ -1,7 +1,8 @@
-using TMPro;
+using MonsterAction.Data;
 using System;
 using System.Collections.Generic;
-using MonsterAction.Data;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -110,19 +111,24 @@ namespace MonsterAction.Home.UI
                     if (level == 0)
                     {
                         // 未購入のときの表示
+                        var name=SkillData.GetName(e.skill);
                         rows[i].Set(name, SkillData.GetStars(0), "未購入", DisabledColor);
                     }
                     else
                     {
                         // すでに買っているときの表示
                         //装備中かどうか調べる
-                        bool equipped = GameData.IsSkillEquipped(e.skill);
                         //       付けている → 右に "装備中"（OnColor）
-                        if (GameData.IsSkillEquipped(e.skill))
-                        { }
-
+                        bool equipped = GameData.IsSkillEquipped(e.skill);
+                        if (equipped)
+                        {
+                            rows[i].Set(name, SkillData.GetStars(0), "装備中", OnColor);
+                        }
                         //       外している → 右に "外している"（OffColor）
-                        else { }
+                        else
+                        {
+                            rows[i].Set(name, SkillData.GetStars(0), "外している", OffColor);
+                        }
                     }
 
                     // TODO ③：スキルの行の表示
@@ -152,6 +158,18 @@ namespace MonsterAction.Home.UI
             }
             else
             {
+                int level = GameData.GetSkillLevel(e.skill);
+
+                if (level == 0)
+                {
+                    ShowMessage("村人のショップで買えます。");
+                }
+                else
+                {
+                    SetDescription(SkillData.GetDescription(e.skill));
+                }
+                    
+
                 // TODO ④：スキルの説明を出す
                 //   SkillData.GetDescription(e.skill) を SetDescription に渡す
                 //   （未購入なら「村人のショップで買えます。」と付け足すと親切）
@@ -180,6 +198,29 @@ namespace MonsterAction.Home.UI
             }
             else
             {
+                ////////作業中
+                int level = GameData.GetSkillLevel(e.skill);
+
+                //1.未購入（GameData.GetSkillLevel が 0 以下）なら … "まだ買っていません"
+                if (level == 0)
+                {
+                    ShowMessage("まだ買っていません");
+                    return;
+                }
+                //   2. 付けていれば外す、外していれば付ける（GameData.SetSkillEquipped）
+                else
+                {
+                   
+                  bool nextState = !GameData.IsSkillEquipped(e.skill); // trueならfalseに、falseならtrueになる
+
+                    
+                    if (!GameData.SetSkillEquipped(e.skill, nextState))
+                    {
+                        // 失敗した時のメッセージを出す
+                        ShowMessage("スキル枠がいっぱいです。先にどれかを外してください");
+                    }
+
+                }
                 // TODO ⑤：スキルを付ける / 外す
                 //   1. 未購入（GameData.GetSkillLevel が 0 以下）なら … "まだ買っていません"
                 //   2. 付けていれば外す、外していれば付ける（GameData.SetSkillEquipped）
