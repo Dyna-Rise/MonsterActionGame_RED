@@ -23,13 +23,14 @@ namespace MonsterAction.Battle.Player
         private float fireTime;        // 撃ったときの StateTime（撃ったあと何秒たったか調べるため）
         private bool holdAnimStarted;  // 「引いたまま」のモーションに切り替えたか
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        private float holdTime;
-
         protected override void Awake()
         {
             base.Awake();   // ← これが無いと Input などが null のまま（消さない）
         }
+
+        //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        [SerializeField] private BowArrow superArrowPrefab; //🔥強い矢→オブジェクト変更
+
 
         // ================================================================
         //  攻撃を始める（普段の移動中に、毎フレーム呼ばれる）
@@ -99,9 +100,13 @@ namespace MonsterAction.Battle.Player
                 }
                 if (!Input.AttackHeld) //□ボタン離したら
                 {
-                    if (StateTime >= 0.3)
+                    if (StateTime >= chargeTime)  
                     {
-                        Fire(); //0.3秒以上経過ならファイヤーメソッド！
+                        Fire(damage,true, superArrowPrefab); //chargeTime以上なら強い矢！🔥第3引数追加
+                    }
+                    else if (StateTime >= 0.3)
+                    {
+                        Fire(chargedDamage,false,arrowPrefab); //🔥第3引数追加
                     }
                     else ReturnToLocomotion(); //未満なら通常へ戻る
                 }
@@ -115,7 +120,7 @@ namespace MonsterAction.Battle.Player
         // ================================================================
 
         /// <summary>矢を放つ。ステップ7では Fire(float power, bool flinch) のように引数を足す</summary>
-        private void Fire()
+        private void Fire(float power,bool flinch,BowArrow prefab) //🔥第3引数追加
         {
             // TODO：
             //   1. isHolding = false;  fireTime = StateTime;   … もう引いていない・撃った時刻を覚える
@@ -125,22 +130,29 @@ namespace MonsterAction.Battle.Player
             //   ステップ5 から：矢を出す
             //   4. 矢を出す位置（胸の高さの少し前）
             //        Vector3 from = transform.position + Vector3.up * 1.4f + transform.forward * 0.5f;
-            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //   5. 飛ばす向き：ふつうは正面 transform.forward
             //        ステップ6：IsFocusing なら GetAimDirection(from)
             //   6. 矢を作って飛ばす
             //        BowArrow arrow = Instantiate(arrowPrefab, from, Quaternion.identity);
             //        arrow.Shoot(向き, damage * AttackMultiplier, gameObject);
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //        （ステップ7：arrow.Shoot(向き, power * AttackMultiplier, gameObject, flinch);）
 
+            //矢の生成位置決定
             Vector3 from = transform.position + Vector3.up * 1.4f + transform.forward * 0.5f;
             //決めた位置に矢を生成
-            BowArrow arrow = Instantiate(arrowPrefab, from, Quaternion.identity);
-            //矢飛ばす:BowArrow.csのShootメソッド発動→引数は(方向,ダメージ量,発射元(自分自身))
-            arrow.Shoot(transform.forward, damage * AttackMultiplier, gameObject);
-            //飛ばす向きの条件付け
-            if (IsFocusing) transform.forward = GetAimDirection(from);
+            BowArrow arrow = Instantiate(prefab, from, Quaternion.identity);
 
+            //飛んで行く向きの条件付け(プレイヤー自身を回転させるのではなく矢の向きを変える)
+            //ifで表現するなら▼
+            //if (IsFocusing) { arrow.Shoot(GetAimDirection(from), damage * AttackMultiplier, gameObject, flinch); }
+            //else { arrow.Shoot(transform.forward, damage * AttackMultiplier, gameObject, flinch); }
+            Vector3 dir = IsFocusing ? GetAimDirection(from) : transform.forward;
+
+            //矢飛ばす:BowArrow.csのShootメソッド発動
+            //引数に(方向,ダメージ量(*攻撃力ｱｯﾌﾟｽｷﾙの倍率),発射元(自分自身))の情報を入れて渡す
+            //transform.forward:正面(オブジェクト(ここではプレイヤー)のZ軸(青矢印)の向き)
+            arrow.Shoot(dir, power * AttackMultiplier, gameObject, flinch);
 
             isHolding = false; //フラグリセット
             //撃った後の時間計測用(isHolding後にReturnToLocomotionするため)

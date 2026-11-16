@@ -168,6 +168,7 @@ MonoBehaviour:
   damage: 10
   chargedDamage: 25
   chargeTime: 1
+  superArrowPrefab: {fileID: 0}
 --- !u!1001 &5238430837689212627
 PrefabInstance:
   m_ObjectHideFlags: 0

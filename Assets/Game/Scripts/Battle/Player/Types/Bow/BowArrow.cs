@@ -3,25 +3,20 @@ using UnityEngine;
 
 public class BowArrow : MonoBehaviour
 {
+    public float arrowSpeed=10.0f; //矢のスピード
 
-
-    public void Shoot(Vector3 dir, float dmg, GameObject own)
+    //PlayerTypeB_Bow.csから引数を受け取る
+    public void Shoot(Vector3 dir, float dmg, GameObject own,bool flin)
     {
-        Rigidbody rbody = obj.GetComponent<Rigidbody>();
-        rbody.AddForce(new Vector3(0, 0, arrowSpeed), ForceMode.Impulse);
-        return ;
+        //矢のRigidbody使って矢を飛ばす
+        Rigidbody rbody = GetComponent<Rigidbody>();
+        rbody.AddForce(dir*arrowSpeed, ForceMode.Impulse);
+        //transform.forward(オブジェクト(ここでは矢)の正面)をdir(プレイヤーの正面)に合わせる
+        transform.forward = dir;
     }
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void OnTriggerEnter(Collider other)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Destroy(gameObject);
     }
 }
