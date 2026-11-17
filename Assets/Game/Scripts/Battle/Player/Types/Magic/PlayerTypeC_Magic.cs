@@ -340,14 +340,16 @@ namespace MonsterAction.Battle.Player
 
             //MagicBullet.csのShoot()に、位置とダメージ、魔法弾プレハブを伝える
             //bullet.Shoot(from, bulletDamage * AttackMultiplier, gameObject);
-            bullet.Shoot(transform.forward, bulletDamage * AttackMultiplier, gameObject);  //gameObjectは消した
+            bullet.Shoot(transform.forward, bulletDamage * AttackMultiplier, gameObject);  //gameObjectは消した。やっぱ残した
         }
 
+        /*
         public float MagicBulletDamage()
         {
             float dmg = bulletDamage * AttackMultiplier;
             return dmg;
         }
+        */
 
         /// <summary>自分の周りにまとめてダメージ（ステップ6）</summary>
         private void Burst()
