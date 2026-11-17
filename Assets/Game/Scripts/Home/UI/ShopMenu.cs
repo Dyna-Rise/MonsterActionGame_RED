@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MonsterAction.Home.UI
 {
-    
+
     public class ShopMenu : HomeMenuBase
     {
         private static readonly Color PriceColor = new Color(1f, 0.85f, 0.3f);
@@ -41,6 +41,14 @@ namespace MonsterAction.Home.UI
             //   ・CreateHeader でスキルの見出しを作る
             //   ・SkillData.All を foreach して、CreateRow() と entries.Add(new Entry { skill = skill })
             //   （上のアイテムとほとんど同じ形です）
+
+            CreateHeader("スキル");
+            foreach (var skill in SkillData.All)
+            {
+                CreateRow();                              // 行を1つ作る
+                entries.Add(new Entry { skill = skill }); // その行の中身を覚えておく
+            }
+
         }
 
         // ================================================================
@@ -74,6 +82,37 @@ namespace MonsterAction.Home.UI
                     //                そうでなければ FormatMoney(GameData.GetNextSkillPrice(e.skill))
                     //   ・右の色  … 売り切れなら DisabledColor、そうでなければ PriceColor
                     //   rows[i].Set(名前, 情報, 右の文字, 右の色); で表示します（上のアイテムが参考になります）
+
+                    // スキルの行：「名前」「☆☆☆ → ★1  ×1.05」「300 G」
+                    int level = GameData.GetSkillLevel(e.skill);
+                    bool isMax = GameData.IsSkillMaxed(e.skill);
+
+                    // SkillData から現在の星と、次の星・倍率を取得する
+                    string currentStars = SkillData.GetStars(level);
+
+                    string infoText;
+                    if (isMax)
+                    {
+                        // 最大レベルのときは現在の星と倍率を表示
+                        float mult = SkillData.GetMultiplier(level);
+                        infoText = $"{currentStars}  ×{mult:F2}";
+                    }
+                    else
+                    {
+                        // 未購入・途中のときは「現在の星 → 次の星 ×倍率」にする
+                        int nextLevel = level + 1;
+                        string nextStars = SkillData.GetStars(nextLevel);
+                        float nextMult = SkillData.GetMultiplier(nextLevel);
+
+                        infoText = $"{currentStars} → {nextStars}  ×{nextMult:F2}";
+                    }
+
+                    rows[i].Set(
+                        SkillData.GetName(e.skill),
+                        infoText,
+                        isMax ? "売切れ" : FormatMoney(GameData.GetNextSkillPrice(e.skill)),
+                        isMax ? DisabledColor : PriceColor
+                    );
                 }
             }
         }
@@ -96,6 +135,8 @@ namespace MonsterAction.Home.UI
                 // TODO ④：スキルの説明を出す
                 //   SkillData.GetDescription(e.skill) を SetDescription に渡す
                 //   （「装備画面（ドア）で付けると効果が出ます。」と付け足すと親切）
+
+                SetDescription(SkillData.GetDescription(e.skill) + "\n装備画面（ドア）で付けると効果が出ます。");
             }
         }
 
@@ -115,6 +156,20 @@ namespace MonsterAction.Home.UI
                 //   2. GameData.TryBuy(e.item) が true なら         … ShowMessage($"{e.item.DisplayName} を買った！")
                 //   3. false なら（お金が足りない）                 … ShowMessage("お金が足りません")
                 //   ヒント：if / else if / else を使います
+
+                if (GameData.GetCount(e.item) >= e.item.MaxCount)
+                {
+                    ShowMessage("これ以上持てません");
+                }
+                else if (GameData.TryBuy(e.item))
+                {
+                    ShowMessage($"{e.item.DisplayName} を買った！");
+                }
+                else
+                {
+                    ShowMessage("お金が足りません");
+                }
+
             }
             else
             {
@@ -122,6 +177,21 @@ namespace MonsterAction.Home.UI
                 //   1. 売り切れ（GameData.IsSkillMaxed）なら       … "売り切れです"
                 //   2. GameData.TryBuySkill(e.skill) が true なら … "〇〇 が ★2 になった！" のように出す
                 //   3. false なら                                 … "お金が足りません"
+
+                if (GameData.IsSkillMaxed(e.skill))
+                {
+                    ShowMessage("売り切れです");
+                }
+                else if (GameData.TryBuySkill(e.skill))
+                {
+                    int newLevel = GameData.GetSkillLevel(e.skill);
+                    string skillName = SkillData.GetName(e.skill);
+                    ShowMessage($"{skillName} が ★{newLevel} になった！");
+                }
+                else
+                {
+                    ShowMessage("お金が足りません");
+                }
             }
 
             Refresh(); // 買ったあと、所持金や所持数の表示を更新する
