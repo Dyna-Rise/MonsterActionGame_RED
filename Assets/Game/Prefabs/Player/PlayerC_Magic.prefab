@@ -164,6 +164,12 @@ MonoBehaviour:
   getUpDuration: 0.8
   cameraTransform: {fileID: 0}
   animator: {fileID: 0}
+  bulletPrefab: {fileID: 790357417139614999, guid: 542e6a4f98003d449915f4fec6d3d7f1, type: 3}
+  bulletDamage: 12
+  castTime: 0.3
+  burstDamage: 30
+  burstRadius: 5
+  burstEffect: {fileID: 5848692154714402708, guid: 1b65ed0c20a2c23428cf4a0ecc33994c, type: 3}
 --- !u!1001 &2671394585417768804
 PrefabInstance:
   m_ObjectHideFlags: 0
