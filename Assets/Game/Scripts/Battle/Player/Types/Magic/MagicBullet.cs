@@ -1,10 +1,11 @@
 using MonsterAction.Battle.Player;
 using MonsterAction.Combat;
 using MonsterAction.Data;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+//public class MagicBullet : PlayerTypeC_Magic
+//public class MagicBullet : PlayerBattleController
 public class MagicBullet : MonoBehaviour
 {
     [Header("弾の消滅時間")]
@@ -18,16 +19,20 @@ public class MagicBullet : MonoBehaviour
     GameObject playerTypeC;
 
     //仮置き・あとでPlayerTypeCから持ってくる
-    private float bulletDamage = 12.0f;
-    private float AttackMultiplier = 1.0f;
+//    private float bulletDamage = 12.0f;
+//    private float AttackMultiplier = 1.0f;
 
     private PlayerBattleController ownerPlayer;
 
+    private PlayerTypeC_Magic player;
+
     private float damage;
+
 
     void Start()
     {
-        Destroy(gameObject, deleteTime);    // 一定時間飛んだら自分自身を消す
+        Destroy(this.gameObject, deleteTime);    // 一定時間飛んだら自分自身を消す
+
     }
 
     private void OnTriggerEnter(Collider other) //other何か　にぶつかったら
@@ -36,7 +41,7 @@ public class MagicBullet : MonoBehaviour
         {
             Destroy(gameObject);    //この弾は即時消える
 
-            float dmg = MagicBulletDamage();
+            //float dmg = MagicBulletDamage();
             //float dmg = playerTypeC.MagicBulletDamage();
 
             //↓ここから下、範囲攻撃のものをそのまま持ってきた
@@ -68,21 +73,22 @@ public class MagicBullet : MonoBehaviour
 
                 //敵にダメージを与える
                 Vector3 dir = col.bounds.center - transform.position; dir.y = 0f;
-                target.ApplyDamage(new DamageInfo(dmg, col.bounds.center, dir.normalized, gameObject));
+                target.ApplyDamage(new DamageInfo(damage, col.bounds.center, dir.normalized, gameObject));
 
-                Debug.Log($"魔法攻撃力x:{dmg}");
+                Debug.Log($"魔法攻撃力x:{damage}");
             }
         }
     }
 
     //Shoot(プレイヤーの向き、ダメージ、オブジェクトのプレハブ）
     //internal void Shoot(Vector3 magicPos, float damage, GameObject bulletPrefab)
-    internal void Shoot(Vector3 playerDirection, float damage, GameObject bulletPrefab)
+    internal void Shoot(Vector3 playerDirection, float dmg, GameObject bulletPrefab)
     {
         //Vector3 magicPos = transform.position + new Vector3(0.0f, 1.0f, 0.5f);  //追加。発射位置を調整用
 
         //攻撃開始Bulletプレハブ生成と前方(magicPosの持つ前方)へシュート
 
+        damage = dmg;
 
         Rigidbody rbody = gameObject.GetComponent<Rigidbody>();  //こいつ自身（生成した魔法弾）のRigidbody
 
@@ -101,11 +107,12 @@ public class MagicBullet : MonoBehaviour
 
     private float MagicBulletDamage()
     {
-        float dmg = bulletDamage * AttackMultiplier;
+        Debug.Log(player);
+        //float dmg = GetMagicBulletDamage();
+        float dmg = player.GetMagicBulletDamage();
+        //float dmg = bulletDamage * AttackMultiplier;
         return dmg;
     }
-
-
 
 
 }

@@ -1,4 +1,5 @@
 using MonsterAction.Combat;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -350,6 +351,11 @@ namespace MonsterAction.Battle.Player
             return dmg;
         }
         */
+        public float GetMagicBulletDamage()
+        {
+            float dmg = bulletDamage * AttackMultiplier;
+            return dmg;
+        }
 
         /// <summary>自分の周りにまとめてダメージ（ステップ6）</summary>
         private void Burst()
@@ -442,6 +448,11 @@ namespace MonsterAction.Battle.Player
         {
             // 今は何もしなくてOK。
             // 余裕があれば：溜め中にオーラ（Human_SpellAura_Fire など）を出したら、ここで Destroy して消す
+        }
+
+        protected static float GetBulletDamage()
+        {
+            throw new NotImplementedException();
         }
     }
 }
