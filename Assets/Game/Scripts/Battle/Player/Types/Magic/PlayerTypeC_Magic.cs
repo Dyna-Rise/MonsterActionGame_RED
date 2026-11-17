@@ -79,7 +79,8 @@ namespace MonsterAction.Battle.Player
                 FaceDirection(GetAttackFacingDirection(), instant: true);
                 // 顔を向ける（集中時：照準、ロックオン：ターゲット）
 
-                CrossFade("Cast");  //Animator のステート切り替え
+                //CrossFade("Cast");  //Animator のステート切り替え
+                CrossFade("ChargeLoad");  //Animator のステート切り替え Castだとボウリングみたいで変だったので変更
 
                 bulletFired = false;    // 弾をもう撃ったか？＝まだ
 
@@ -198,20 +199,22 @@ namespace MonsterAction.Battle.Player
             switch (step)
             {
                 case Step.Cast:     //現在のステップがキャスト（詠唱中）なら、
-                    StepCast();
+                    StepCast(); //弾を撃つか、長押しチャージのどっちなのメソッド
                     break;
-                case Step.Charge:   //現在のステップがチャージなら
+                case Step.Charge:   //現在のステップがチャージ（0.4秒以上）なら、範囲魔法発動
                     //StepCharge();
-                    CrossFade("ChargeCast"); 
+                    //CrossFade("ChargeCast");
                     Burst(); 
                     ChangeStep(Step.Burst);
+                    t = 0;
                     break;
-                case Step.Burst:
+                case Step.Burst:    //範囲魔法発動中
                     if (t >= 0.8f)  //0.8秒以上
                     {
                         ReturnToLocomotion();   //攻撃モーションをやめて、普段の移動に戻る
                         bulletFired = false;    //念のため、弾を撃っていない状態に戻しておく
                         ChangeStep(Step.Locomotion); //ステップを移動にリセット
+                        t = 0;
                     }
                     break;
             }
@@ -257,7 +260,8 @@ namespace MonsterAction.Battle.Player
                 {
                     //Debug.Log("□ 長押し");
 
-                    CrossFade("ChargeLoad");    //チャージロードのアニメに切り替え
+                    //CrossFade("ChargeLoad");    //チャージロードのアニメに切り替え
+                    CrossFade("Cast");    //チャージロードのアニメに切り替え←変だったのでLoadとCast入れ替え
                     ChangeStep(Step.Charge);    //ステップをチャージに変更
 
                     return;
@@ -336,8 +340,13 @@ namespace MonsterAction.Battle.Player
 
             //MagicBullet.csのShoot()に、位置とダメージ、魔法弾プレハブを伝える
             //bullet.Shoot(from, bulletDamage * AttackMultiplier, gameObject);
-            bullet.Shoot(transform.forward, bulletDamage * AttackMultiplier);  //gameObjectは消した
+            bullet.Shoot(transform.forward, bulletDamage * AttackMultiplier, gameObject);  //gameObjectは消した
+        }
 
+        public float MagicBulletDamage()
+        {
+            float dmg = bulletDamage * AttackMultiplier;
+            return dmg;
         }
 
         /// <summary>自分の周りにまとめてダメージ（ステップ6）</summary>

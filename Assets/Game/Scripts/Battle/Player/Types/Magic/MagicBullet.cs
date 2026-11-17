@@ -1,3 +1,4 @@
+using MonsterAction.Battle.Player;
 using MonsterAction.Combat;
 using MonsterAction.Data;
 using System;
@@ -7,10 +8,22 @@ using UnityEngine;
 public class MagicBullet : MonoBehaviour
 {
     [Header("弾の消滅時間")]
-    public float deleteTime = 2.0f; // 魔法が消えるまでの時間    初期設定は 5.0f
+    [SerializeField] private　float deleteTime = 2.0f; // 魔法が消えるまでの時間    初期設定は 5.0f
 
     [Header("弾速")]
-    public float bulletSpeed = 20.0f;
+    [SerializeField] private float bulletSpeed = 20.0f;
+
+
+    [Header("プレイヤーTypeC")]
+    GameObject playerTypeC;
+
+    //仮置き・あとでPlayerTypeCから持ってくる
+    private float bulletDamage = 12.0f;
+    private float AttackMultiplier = 1.0f;
+
+    private PlayerBattleController ownerPlayer;
+
+    private float damage;
 
     void Start()
     {
@@ -22,12 +35,49 @@ public class MagicBullet : MonoBehaviour
         if (other.gameObject.tag != "Player")   //プレイヤー以外にぶつかったら
         {
             Destroy(gameObject);    //この弾は即時消える
+
+            float dmg = MagicBulletDamage();
+            //float dmg = playerTypeC.MagicBulletDamage();
+
+            //↓ここから下、範囲攻撃のものをそのまま持ってきた
+            Collider[] hits = Physics.OverlapSphere(
+                transform.position + Vector3.up, //こいつの場所を中心に、
+                1.0f,                     //範囲(1.0f)
+                ~0,                              //←すべてのレイヤーという意味らしい
+                QueryTriggerInteraction.Collide  //IsTriggerも含む
+                );
+
+            //   3. 同じボスに何回も当てないためのリスト
+            List<IDamageable> alreadyHit = new List<IDamageable>();
+
+            foreach (Collider col in hits)
+            {
+                if (col.transform.IsChildOf(transform)) continue;
+                //自分(Player)と、その子(Playerのパーツ)の体なら、飛ばす（＝foreach終了する）
+
+                //ダメージを受けられる相手か
+                IDamageable target = col.GetComponentInParent<IDamageable>();
+                if (target == null || !target.IsAlive) continue;
+                //ターゲットがnullあるいは生きていないなら、foreach終了
+
+                //ボスの部位（頭・しっぽなど）なら、持ち主のボスで「当てたか」を数える
+                IDamageable boss = target;
+                if (target is IDamagePart part) boss = part.Owner;
+                if (alreadyHit.Contains(boss)) continue;
+                alreadyHit.Add(boss);
+
+                //敵にダメージを与える
+                Vector3 dir = col.bounds.center - transform.position; dir.y = 0f;
+                target.ApplyDamage(new DamageInfo(dmg, col.bounds.center, dir.normalized, gameObject));
+
+                Debug.Log($"魔法攻撃力x:{dmg}");
+            }
         }
     }
 
     //Shoot(プレイヤーの向き、ダメージ、オブジェクトのプレハブ）
     //internal void Shoot(Vector3 magicPos, float damage, GameObject bulletPrefab)
-    internal void Shoot(Vector3 playerDirection, float damage)
+    internal void Shoot(Vector3 playerDirection, float damage, GameObject bulletPrefab)
     {
         //Vector3 magicPos = transform.position + new Vector3(0.0f, 1.0f, 0.5f);  //追加。発射位置を調整用
 
@@ -45,6 +95,17 @@ public class MagicBullet : MonoBehaviour
         //打ち出すときにみにチェックしているので、Time.deltatimeはつけなくてもPCによる性能差は出ない
 
         //Debug.Log("魔法撃ったよ");
+        //Debug.Log($"魔法攻撃力:{damage}");
 
     }
+
+    private float MagicBulletDamage()
+    {
+        float dmg = bulletDamage * AttackMultiplier;
+        return dmg;
+    }
+
+
+
+
 }
