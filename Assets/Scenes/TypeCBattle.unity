@@ -239,6 +239,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1319380445762843580, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 1319380445762843580, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1819913755549224185, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 1819913755549224185, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361456488442240759, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 2361456488442240759, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3326437749402498311, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 6014078264202166151, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
       propertyPath: m_Name
       value: BattleHUD
@@ -321,6 +349,38 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6874700723198376188, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929620232845529858, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 6929620232845529858, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7780723889269848347, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7780723889269848347, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8421581116730166162, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8421581116730166162, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8574420345699927475, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8574420345699927475, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+      propertyPath: m_ActiveFontFeatures.Array.size
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -455,18 +515,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!114 &314461682 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7462193429047610182, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
-  m_PrefabInstance: {fileID: 166001414}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a455c0e1d4dbc544abbda150a49261f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MonsterAction.Battle.UI.BattleResultUI
---- !u!1001 &358627175
+--- !u!1001 &303105405
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -476,15 +525,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1219351307949335862, guid: cd89c67fb80dcd84bb5ce6e0172e17e8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 150
+      value: 140
       objectReference: {fileID: 0}
     - target: {fileID: 1219351307949335862, guid: cd89c67fb80dcd84bb5ce6e0172e17e8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1219351307949335862, guid: cd89c67fb80dcd84bb5ce6e0172e17e8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 145
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 1219351307949335862, guid: cd89c67fb80dcd84bb5ce6e0172e17e8, type: 3}
       propertyPath: m_LocalRotation.w
@@ -514,6 +563,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3520552141818903294, guid: cd89c67fb80dcd84bb5ce6e0172e17e8, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3754667930184107469, guid: cd89c67fb80dcd84bb5ce6e0172e17e8, type: 3}
       propertyPath: m_Name
       value: PlayerC_Magic
@@ -523,6 +576,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cd89c67fb80dcd84bb5ce6e0172e17e8, type: 3}
+--- !u!114 &314461682 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7462193429047610182, guid: ce9b77fc61e518441bda596ecdc97e4c, type: 3}
+  m_PrefabInstance: {fileID: 166001414}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a455c0e1d4dbc544abbda150a49261f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterAction.Battle.UI.BattleResultUI
 --- !u!1 &565221398
 GameObject:
   m_ObjectHideFlags: 0
@@ -1555,4 +1619,4 @@ SceneRoots:
   - {fileID: 625989330}
   - {fileID: 694341830}
   - {fileID: 1001943751}
-  - {fileID: 358627175}
+  - {fileID: 303105405}
