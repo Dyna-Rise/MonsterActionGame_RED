@@ -82,9 +82,7 @@ namespace MonsterAction.Battle.Player
             //       2. FaceDirection(GetAttackFacingDirection()); … 狙う方を向き続ける
             //       3. 0.4 秒たったら、1回だけ CrossFade("BowHold");（holdAnimStarted で1回だけにする）
             //       4. □ を離したら（!Input.AttackHeld）、0.3 秒以上引いていれば Fire();
-            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //          ステップ7：StateTime >= chargeTime なら強い矢、そうでなければふつうの矢
-            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //       5. return;
             //   }
             //   撃ったあと：StateTime - fireTime が 0.5 秒以上になったら ReturnToLocomotion();
@@ -102,11 +100,11 @@ namespace MonsterAction.Battle.Player
                 {
                     if (StateTime >= chargeTime)  
                     {
-                        Fire(damage,true, superArrowPrefab); //chargeTime以上なら強い矢！🔥第3引数追加
+                        Fire(chargedDamage, true, superArrowPrefab); //chargeTime以上なら強い矢！🔥第3引数追加
                     }
                     else if (StateTime >= 0.3)
                     {
-                        Fire(chargedDamage,false,arrowPrefab); //🔥第3引数追加
+                        Fire(damage,false,arrowPrefab); //🔥第3引数追加
                     }
                     else ReturnToLocomotion(); //未満なら通常へ戻る
                 }
@@ -135,7 +133,6 @@ namespace MonsterAction.Battle.Player
             //   6. 矢を作って飛ばす
             //        BowArrow arrow = Instantiate(arrowPrefab, from, Quaternion.identity);
             //        arrow.Shoot(向き, damage * AttackMultiplier, gameObject);
-            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //        （ステップ7：arrow.Shoot(向き, power * AttackMultiplier, gameObject, flinch);）
 
             //矢の生成位置決定
@@ -144,14 +141,14 @@ namespace MonsterAction.Battle.Player
             BowArrow arrow = Instantiate(prefab, from, Quaternion.identity);
 
             //飛んで行く向きの条件付け(プレイヤー自身を回転させるのではなく矢の向きを変える)
-            //ifで表現するなら▼
+            //transform.forward:正面(オブジェクト(ここではプレイヤー)のZ軸(青矢印)の向き)
+            //▼2行のifでの言い換え
             //if (IsFocusing) { arrow.Shoot(GetAimDirection(from), damage * AttackMultiplier, gameObject, flinch); }
             //else { arrow.Shoot(transform.forward, damage * AttackMultiplier, gameObject, flinch); }
             Vector3 dir = IsFocusing ? GetAimDirection(from) : transform.forward;
 
             //矢飛ばす:BowArrow.csのShootメソッド発動
             //引数に(方向,ダメージ量(*攻撃力ｱｯﾌﾟｽｷﾙの倍率),発射元(自分自身))の情報を入れて渡す
-            //transform.forward:正面(オブジェクト(ここではプレイヤー)のZ軸(青矢印)の向き)
             arrow.Shoot(dir, power * AttackMultiplier, gameObject, flinch);
 
             isHolding = false; //フラグリセット
