@@ -169,6 +169,7 @@ MonoBehaviour:
   chargedDamage: 25
   chargeTime: 1
   superArrowPrefab: {fileID: -7806372544992149946, guid: 81ac391914da46d4d822790ba4ac0105, type: 3}
+  effectObj: {fileID: 162770279293253243, guid: 05ac25e954144194b8b87d0c1ab13956, type: 3}
 --- !u!1001 &5238430837689212627
 PrefabInstance:
   m_ObjectHideFlags: 0
