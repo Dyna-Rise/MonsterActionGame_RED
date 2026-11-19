@@ -88,7 +88,9 @@ namespace MonsterAction.Battle.Player
             //       2. FaceDirection(GetAttackFacingDirection()); … 狙う方を向き続ける
             //       3. 0.4 秒たったら、1回だけ CrossFade("BowHold");（holdAnimStarted で1回だけにする）
             //       4. □ を離したら（!Input.AttackHeld）、0.3 秒以上引いていれば Fire();
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //          ステップ7：StateTime >= chargeTime なら強い矢、そうでなければふつうの矢
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //       5. return;
             //   }
             //   撃ったあと：StateTime - fireTime が 0.5 秒以上になったら ReturnToLocomotion();
@@ -157,6 +159,7 @@ namespace MonsterAction.Battle.Player
             //   6. 矢を作って飛ばす
             //        BowArrow arrow = Instantiate(arrowPrefab, from, Quaternion.identity);
             //        arrow.Shoot(向き, damage * AttackMultiplier, gameObject);
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             //        （ステップ7：arrow.Shoot(向き, power * AttackMultiplier, gameObject, flinch);）
 
             //矢の生成位置決定

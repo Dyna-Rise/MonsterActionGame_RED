@@ -1,9 +1,17 @@
+using System.IO.IsolatedStorage;
 using MonsterAction.Combat; //IDamageable使うのに必要
 using UnityEngine;
 
 public class BowArrow : MonoBehaviour
 {
-    public float arrowSpeed = 10.0f; //矢のスピード
+    public float arrowSpeed=10.0f; //矢のスピード
+
+    //PlayerTypeB_Bow.csから引数を受け取る
+    public void Shoot(Vector3 dir, float dmg, GameObject own,bool flin)
+    {
+        //矢のRigidbody使って矢を飛ばす
+        Rigidbody rbody = GetComponent<Rigidbody>();
+        rbody.AddForce(dir*arrowSpeed, ForceMode.Impulse);
     public float deleteTime = 3.0f; //削除時間
 
     private float damage;
@@ -32,6 +40,7 @@ public class BowArrow : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Destroy(gameObject);
         //IDamageableを持っているかどうかで敵かそれ以外かを判定
         // IDamageable:ダメージを受け取れる機能(今回はBossBase.csが所持)
 

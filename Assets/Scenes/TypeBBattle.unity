@@ -1276,6 +1276,25 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 6576552724650268553, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 917811258}
+    - target: {fileID: 6576552724650268553, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: arrowPrefab
+      value: 
+      objectReference: {fileID: -7806372544992149946, guid: 31a32d4e0b02b394da299e7d683dbf53, type: 3}
+    - target: {fileID: 6576552724650268553, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: cameraTransform
+      value: 
+      objectReference: {fileID: 961739753}
+    - target: {fileID: 6576552724650268553, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: superArrowPrefab
+      value: 
+      objectReference: {fileID: -7806372544992149946, guid: 81ac391914da46d4d822790ba4ac0105, type: 3}
+    - target: {fileID: 7243848789026627947, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
+      propertyPath: actions
+      value: 
+      objectReference: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
       propertyPath: cameraTransform
       value: 
       objectReference: {fileID: 961739753}
