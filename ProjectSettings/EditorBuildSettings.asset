@@ -9,11 +9,11 @@ EditorBuildSettings:
     path: Assets/Scenes/Title.unity
     guid: e1b7a1d5e8914e24a9a59d3c9184d508
   - enabled: 1
-    path: Assets/Scenes/Home.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/Battle.unity
+    guid: 252b0ebf937f67442bef20eb62d8e40a
   - enabled: 1
-    path: Assets/Scenes/BossBattle.unity
-    guid: e0d38f5de1861eb42adcd7f57f45074b
+    path: Assets/Scenes/Home.unity
+    guid: 74a37cbf2f6487a46a6d13b13bad96ee
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
