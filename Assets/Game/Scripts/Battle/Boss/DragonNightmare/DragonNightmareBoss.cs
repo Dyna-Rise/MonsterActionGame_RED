@@ -2,7 +2,24 @@ using System.Collections;
 using UnityEngine;
 
 namespace MonsterAction.Battle.Boss
-{    
+{
+    /// <summary>
+    /// ボスのサンプル：ナイトメアドラゴン（アルビノ）。ティガレックス風の行動パターン。
+    ///
+    /// 【行動パターン】（★ = 大攻撃：当たるとプレイヤーがダウン）
+    ///   戦闘開始 / HP 半分で怒り   → 咆哮（近くにいるとのけぞる）
+    ///   近い（meleeRange 以内）    → 噛みつき / ひっかき（小攻撃）。ときどきブレス★ / 投擲★
+    ///   中くらい（farRange 以内）  → 突進★（ゆるくホーミング → ドリフトで向き直り → また突進）が多め。ブレス★ / 投擲★
+    ///   遠い                       → ブレス★ / 投擲★ / 突進★
+    ///   どの攻撃も、振りかぶりの間はプレイヤーへ軸合わせ（向き直し）してくる
+    ///   攻撃の後は少し休む（プレイヤーの攻撃チャンス）
+    ///
+    /// 【ボス担当の人へ】
+    /// 自分のボスを作るときは、このファイルをまねして
+    ///   ・ThinkNextAction() … どの行動をするか決める（距離と確率）
+    ///   ・行動ごとのコルーチン … 「向く → モーション → 軸合わせしながら待つ → 判定 ON/OFF → 休む」
+    /// を書けば OK です。
+    /// </summary>
     public class DragonNightmareBoss : BossBase
     {
         [Header("距離")]
@@ -94,47 +111,59 @@ namespace MonsterAction.Battle.Boss
         //  どの行動をするか決める
         // ================================================================
 
-        /// <summary>次の行動を決めて返す（行動が終わるたびに呼ばれる）</summary>
         protected override IEnumerator ThinkNextAction()
         {
-            // TODO：次にやる行動を return で返す
-            //   ★ 書きはじめたら、下の「yield return null;」は必ず消す
-            //     （yield return があるメソッドでは return Roar(); と書けない＝エラーになる）
-            //
-            //   まずはこれだけ（ずっと吠え続ける）：
-            //     return Roar();
-            //
-            //   できるようになったら：
-            //   1. 最初に1回だけ吠える
-            //        if (!hasRoared) { hasRoared = true; return Roar(); }
-            //   2. HP が半分を切ったら怒る（1回だけ）
-            //        if (!enraged && HpRate <= 0.5f) { enraged = true; Anim.speed = enragedAnimSpeed; return Roar(); }
-            //   3. 距離とサイコロで選ぶ
-            //        float distance = DistanceToPlayer;
-            //        int r = Random.Range(0, 100);          // 0〜99。数字の幅が出やすさ
-            //        if (distance <= meleeRange) { if (r < 40) return Bite(); ... }
-            //        if (distance <= farRange)   { if (r < 55) return ChargeCombo(); ... }
-            //        （遠いとき）...
-            //   4. 最後は必ず何かを return する（どの if にも入らなかったとき用）
-            yield return null; //エラー回避用
+            if (!hasRoared)
+            {
+                hasRoared = true;
+                return Roar();
+            }
+            if (!enraged && HpRate <= 0.5f)
+            {
+                enraged = true;
+                Anim.speed = enragedAnimSpeed;
+                return Roar();
+            }
+
+            float distance = DistanceToPlayer;
+            int r = Random.Range(0, 100); // 0〜99 のサイコロ。数字の幅が出やすさ
+
+            if (distance <= meleeRange)
+            {
+                // 近距離：小攻撃メイン、ときどき遠距離攻撃
+                if (r < 40) return Bite();
+                if (r < 75) return Scratch();
+                if (r < 88) return Breath();
+                return Throw();
+            }
+
+            if (distance <= farRange)
+            {
+                // 中距離：突進が多め
+                if (r < 55) return ChargeCombo();
+                if (r < 75) return Breath();
+                if (r < 90) return Throw();
+                return Approach(2f);
+            }
+
+            // 遠距離：ブレスか投擲、ときどき突進
+            if (r < 35) return Breath();
+            if (r < 70) return Throw();
+            return ChargeCombo();
         }
 
         // ================================================================
         //  咆哮
         // ================================================================
 
-        /// <summary>咆哮：プレイヤーの方を向いて吠える。近くにいるとのけぞらせる（ダメージなし）</summary>
         private IEnumerator Roar()
         {
-            // TODO：
-            //   1. プレイヤーの方を向く          yield return TurnToPlayer(1f, Walk);
-            //   2. 吠えるモーション              Play(Scream);
-            //   3. モーションの 25% まで待つ      yield return WaitStateTime(Scream, 0.25f);
-            //   4. 周りをのけぞらせる            AreaAttack(transform.position, roarRadius, 0f, knockback: 1.5f);
-            //                                    （3つ目の 0f がダメージ。0 なのでのけぞるだけ）
-            //   5. モーションの最後まで待つ      yield return WaitStateTime(Scream, 0.95f);
-            //   6. 少し休む                      yield return Rest(RestTime(0.5f));
-            yield return null; //エラー回避用
+            yield return TurnToPlayer(1f, Walk);
+            Play(Scream);
+            yield return WaitStateTime(Scream, 0.25f);
+            AreaAttack(transform.position, roarRadius, 0f, knockback: 1.5f); // ダメージなし、のけぞり
+            yield return WaitStateTime(Scream, 0.95f);
+            yield return Rest(RestTime(0.5f));
         }
 
         // ================================================================
@@ -144,34 +173,33 @@ namespace MonsterAction.Battle.Boss
         /// <summary>噛みつき（小）：軸合わせしながら踏み込んで噛む</summary>
         private IEnumerator Bite()
         {
-            // TODO：攻撃は「向く → 振りかぶり → 判定 ON → 判定 OFF → 休む」の順
-            //   1. プレイヤーの方を向く（0.5 秒）   yield return TurnToPlayer(0.5f, Walk);
-            //   2. 噛みつきモーション              Play(BasicAttack);
-            //   3. 振りかぶり：モーションが 30% になるまで、向きを合わせながら少し前へ
-            //        while (GetStateTime(BasicAttack) < 0.3f)
-            //        {
-            //            FaceTowards(DirectionToPlayer, 1.5f);
-            //            Move(transform.forward * 2.5f);
-            //            yield return null;
-            //        }
-            //   4. 口の攻撃判定 ON                 biteHitbox.Begin(biteDamage, knockback: 1f);
-            //   5. 55% まで待って OFF              WaitStateTime(BasicAttack, 0.55f) → biteHitbox.End();
-            //   6. 最後まで待って休む              WaitStateTime(BasicAttack, 0.95f) → Rest(RestTime(1.0f))
-            yield return null; //エラー回避用
+            yield return TurnToPlayer(0.5f, Walk);
+            Play(BasicAttack);
+            // 振りかぶり：軸合わせしながら少し踏み込む
+            while (GetStateTime(BasicAttack) < 0.3f)
+            {
+                FaceTowards(DirectionToPlayer, 1.5f);
+                Move(transform.forward * 2.5f);
+                yield return null;
+            }
+            biteHitbox.Begin(biteDamage, knockback: 1f);
+            yield return WaitStateTime(BasicAttack, 0.55f);
+            biteHitbox.End();
+            yield return WaitStateTime(BasicAttack, 0.95f);
+            yield return Rest(RestTime(1.0f));
         }
 
         /// <summary>ひっかき（小）：軸合わせしてから翼の爪で軽く払う</summary>
         private IEnumerator Scratch()
         {
-            // TODO：Bite とほぼ同じ形。違うところ：
-            //   ・モーションは ClawAttack
-            //   ・振りかぶりは WaitStateTimeTracking(ClawAttack, 0.3f, 1.5f) で「向き直りながら待つ」だけ（前には進まない）
-            //   ・爪は左右に2つあるので、foreach で両方 ON / OFF する
-            //        foreach (var h in clawHitboxes) h.Begin(clawDamage, knockback: 0.8f);
-            //        ...
-            //        foreach (var h in clawHitboxes) h.End();
-            //   ・判定は 30% 〜 55%、最後に Rest(RestTime(0.9f))
-            yield return null; //エラー回避用
+            yield return TurnToPlayer(0.5f, Walk);
+            Play(ClawAttack);
+            yield return WaitStateTimeTracking(ClawAttack, 0.3f, 1.5f);
+            foreach (var h in clawHitboxes) h.Begin(clawDamage, knockback: 0.8f);
+            yield return WaitStateTime(ClawAttack, 0.55f);
+            foreach (var h in clawHitboxes) h.End();
+            yield return WaitStateTime(ClawAttack, 0.95f);
+            yield return Rest(RestTime(0.9f));
         }
 
         // ================================================================
@@ -184,18 +212,19 @@ namespace MonsterAction.Battle.Boss
         /// </summary>
         private IEnumerator Breath()
         {
-            // TODO：（先に FanDirections を作っておく）
-            //   1. 向く（0.8 秒）→ Play(Scream) → WaitStateTimeTracking(Scream, 0.35f, 1.2f)（予兆の間、軸合わせ）
-            //   2. 火球を出す位置：口の前あたり
-            //        Vector3 start = transform.position + transform.forward * breathStartForward + Vector3.up * breathHeight;
-            //   3. FanDirections(breathCount, breathSpreadAngle) の向きごとに、火球を作って飛ばす
-            //        foreach (Vector3 dir in FanDirections(breathCount, breathSpreadAngle))
-            //        {
-            //            var ball = BossProjectile.Spawn(breathPrefab, start, breathRadius, breathColor);
-            //            ball.Launch(dir * breathSpeed, MakeDamage(breathDamage, knockback: 4f, knockDown: true), transform);
-            //        }
-            //   4. WaitStateTime(Scream, 0.95f) → Rest(RestTime(1.4f))
-            yield return null; //エラー回避用
+            yield return TurnToPlayer(0.8f, Walk);
+            Play(Scream);
+            yield return WaitStateTimeTracking(Scream, 0.35f, 1.2f); // 軸合わせ（予兆）
+
+            Vector3 start = transform.position + transform.forward * breathStartForward + Vector3.up * breathHeight;
+            foreach (Vector3 dir in FanDirections(breathCount, breathSpreadAngle))
+            {
+                var ball = BossProjectile.Spawn(breathPrefab, start, breathRadius, breathColor);
+                ball.Launch(dir * breathSpeed, MakeDamage(breathDamage, knockback: 4f, knockDown: true), transform);
+            }
+
+            yield return WaitStateTime(Scream, 0.95f);
+            yield return Rest(RestTime(1.4f));
         }
 
         /// <summary>
@@ -204,29 +233,35 @@ namespace MonsterAction.Battle.Boss
         /// </summary>
         private IEnumerator Throw()
         {
-            // TODO：Breath とほぼ同じ形。違うところ：
-            //   ・モーションは HornAttack、予兆は 40%（WaitStateTimeTracking(HornAttack, 0.4f, 1.2f)）
-            //   ・出す位置は rockStartForward / rockStartHeight、数と角度は rockCount / rockSpreadAngle
-            //   ・まっすぐではなく、放物線で「決まった場所」に落とす
-            //        Vector3 landing = transform.position + dir * rockDistance;   // 落ちる場所
-            //        landing.y = transform.position.y;
-            //        var rock = BossProjectile.Spawn(rockPrefab, start, rockRadius, rockColor);
-            //        rock.Launch(BossProjectile.BallisticVelocity(start, landing, rockFlightTime, rockGravity),
-            //                    MakeDamage(rockDamage, knockback: 3f, knockDown: true), transform, rockGravity);
-            //   ・最後は WaitStateTime(HornAttack, 0.95f) → Rest(RestTime(1.4f))
-            yield return null; //エラー回避用
+            yield return TurnToPlayer(0.8f, Walk);
+            Play(HornAttack);
+            yield return WaitStateTimeTracking(HornAttack, 0.4f, 1.2f); // 軸合わせ（予兆）
+
+            Vector3 start = transform.position + transform.forward * rockStartForward + Vector3.up * rockStartHeight;
+            foreach (Vector3 dir in FanDirections(rockCount, rockSpreadAngle))
+            {
+                Vector3 landing = transform.position + dir * rockDistance; // 地面に落ちる位置（毎回同じ）
+                landing.y = transform.position.y;
+                var rock = BossProjectile.Spawn(rockPrefab, start, rockRadius, rockColor);
+                rock.Launch(BossProjectile.BallisticVelocity(start, landing, rockFlightTime, rockGravity),
+                            MakeDamage(rockDamage, knockback: 3f, knockDown: true), transform, rockGravity);
+            }
+
+            yield return WaitStateTime(HornAttack, 0.95f);
+            yield return Rest(RestTime(1.4f));
         }
 
         /// <summary>正面を中心に、count 本の方向を angle 度ずつ左右に広げて返す（水平）</summary>
         private System.Collections.Generic.IEnumerable<Vector3> FanDirections(int count, float angle)
         {
-            // TODO：例）count = 3, angle = 12 なら「左 12°・正面・右 12°」の3つの向きを返す
-            //   1. 正面の向き（水平）     Vector3 forward = transform.forward; forward.y = 0f; forward.Normalize();
-            //   2. for (int i = 0; i < count; i++) で1本ずつ
-            //        float offset = (i - (count - 1) * 0.5f) * angle;   // 3本なら -12, 0, +12
-            //        yield return Quaternion.AngleAxis(offset, Vector3.up) * forward;   // 正面を offset 度だけ回した向き
-            //   ★ 書きはじめたら、下の「yield break;」は消してOK
-            yield break; // 何も返さない（エラー回避用）
+            Vector3 forward = transform.forward;
+            forward.y = 0f;
+            forward.Normalize();
+            for (int i = 0; i < count; i++)
+            {
+                float offset = (i - (count - 1) * 0.5f) * angle; // 例：3本なら -angle, 0, +angle
+                yield return Quaternion.AngleAxis(offset, Vector3.up) * forward;
+            }
         }
 
         // ================================================================
@@ -238,58 +273,77 @@ namespace MonsterAction.Battle.Boss
         /// </summary>
         private IEnumerator ChargeCombo()
         {
-            // TODO：突進全体の流れ（実際に走るのは ChargeRun、止まるのは Brake）
-            //   1. 向く（0.8 秒）
-            //   2. 予兆：短く吠える        Play(Scream, 0.1f); → WaitStateTimeTracking(Scream, 0.25f, 1.5f)
-            //   3. 走る                    yield return ChargeRun();   （コルーチンの中から別のコルーチンを呼んで、終わるまで待てる）
-            //      ★ 慣れたら：回数を決めて for でくり返し、突進と突進の間に Drift() をはさむ
-            //        int charges = Random.Range(1, maxCharges + 1);
-            //        for (int i = 0; i < charges; i++) { yield return ChargeRun(); if (i < charges - 1) yield return Drift(); }
-            //   4. 止まる                  yield return Brake(0.6f);
-            //   5. 休む                    yield return Rest(RestTime(1.6f));
-            yield return null; //エラー回避用
+            yield return TurnToPlayer(0.8f, Walk);
+
+            // 予兆：短く吠える
+            Play(Scream, 0.1f);
+            yield return WaitStateTimeTracking(Scream, 0.25f, 1.5f);
+
+            int charges = Random.Range(1, maxCharges + 1);
+            for (int i = 0; i < charges; i++)
+            {
+                yield return ChargeRun();
+                if (i < charges - 1) yield return Drift();
+            }
+
+            // 最後はブレーキをかけて止まる
+            yield return Brake(0.6f);
+            yield return Rest(RestTime(1.6f));
         }
 
         /// <summary>1回分の突進：ゆるく追いかけながら走り、プレイヤーを通り過ぎたら終わる</summary>
         private IEnumerator ChargeRun()
         {
-            // TODO：
-            //   1. Play(Run, 0.1f);
-            //   2. 体の攻撃判定 ON（大攻撃）   bodyHitbox.Begin(chargeDamage, knockback: 6f, knockDown: true);
-            //   3. chargeMaxTime 秒まで、毎フレーム
-            //        ・FaceTowards(DirectionToPlayer, chargeHoming);   // ゆるく追いかける（小さいほど曲がりにくい）
-            //        ・Move(transform.forward * chargeSpeed);
-            //        ・プレイヤーが後ろ側（Mathf.Abs(AngleToPlayer) > 100f）にいる時間を数えて、0.35 秒を超えたら break
-            //        ・time += Time.deltaTime;  yield return null;
-            //   4. 判定 OFF                    bodyHitbox.End();
-            yield return null; //エラー回避用
+            Play(Run, 0.1f);
+            bodyHitbox.Begin(chargeDamage, knockback: 6f, knockDown: true);
+
+            float time = 0f;
+            float passedTime = 0f;
+            while (time < chargeMaxTime)
+            {
+                FaceTowards(DirectionToPlayer, chargeHoming); // ゆるくホーミング
+                Move(transform.forward * chargeSpeed);
+
+                // プレイヤーが真後ろ側に回った（通り過ぎた）ら、少し走ってから終わる
+                if (Mathf.Abs(AngleToPlayer) > 100f) passedTime += Time.deltaTime;
+                if (passedTime > 0.35f) break;
+
+                time += Time.deltaTime;
+                yield return null;
+            }
+            bodyHitbox.End();
         }
 
         /// <summary>ドリフト：勢いで滑りながら、すばやくプレイヤーの方へ向き直る（この間も当たる）</summary>
         private IEnumerator Drift()
         {
-            // TODO：
-            //   1. 今の勢いを覚える            Vector3 slide = transform.forward * chargeSpeed;
-            //   2. プレイヤーがいる側へ滑るモーション
-            //        Play(AngleToPlayer > 0f ? "Walk Right" : "Walk Left", 0.1f);
-            //   3. 判定 ON（突進より少し弱く） bodyHitbox.Begin(chargeDamage * 0.7f, knockback: 4f, knockDown: true);
-            //   4. driftTime 秒の間、毎フレーム
-            //        float rate = 1f - time / driftTime;     // 1 → 0 にだんだん減る
-            //        Move(slide * rate);                      // 勢いがだんだん落ちる
-            //        FaceTowards(DirectionToPlayer, driftTurn);  // すばやく向き直る
-            //   5. 判定 OFF
-            yield return null; //エラー回避用
+            Vector3 slide = transform.forward * chargeSpeed;
+            Play(AngleToPlayer > 0f ? "Walk Right" : "Walk Left", 0.1f);
+            bodyHitbox.Begin(chargeDamage * 0.7f, knockback: 4f, knockDown: true);
+
+            float time = 0f;
+            while (time < driftTime)
+            {
+                float rate = 1f - time / driftTime;
+                Move(slide * rate);                           // 勢いがだんだん落ちる
+                FaceTowards(DirectionToPlayer, driftTurn);    // すばやく向き直る
+                time += Time.deltaTime;
+                yield return null;
+            }
+            bodyHitbox.End();
         }
 
         /// <summary>減速して止まる</summary>
         private IEnumerator Brake(float seconds)
         {
-            // TODO：
-            //   1. Play(Walk, 0.2f);
-            //   2. seconds 秒の間、毎フレーム少しずつ遅く進む
-            //        Move(transform.forward * chargeSpeed * (1f - time / seconds) * 0.5f);
-            //        time += Time.deltaTime;  yield return null;
-            yield return null; //エラー回避用
+            Play(Walk, 0.2f);
+            float time = 0f;
+            while (time < seconds)
+            {
+                Move(transform.forward * chargeSpeed * (1f - time / seconds) * 0.5f);
+                time += Time.deltaTime;
+                yield return null;
+            }
         }
 
         // ================================================================
@@ -299,18 +353,18 @@ namespace MonsterAction.Battle.Boss
         /// <summary>歩いて近づく</summary>
         private IEnumerator Approach(float maxSeconds)
         {
-            // TODO：
-            //   1. Play(Walk, 0.25f);
-            //   2. 終わる時刻を決める          float end = Time.time + maxSeconds;
-            //   3. 時間切れになるか、十分近づく（DistanceToPlayer > meleeRange * 0.8f でなくなる）まで、毎フレーム
-            //        FaceTowards(DirectionToPlayer);          // プレイヤーの方へ向く
-            //        Move(transform.forward * walkSpeed);     // 前に進む
-            //        yield return null;                       // 次のフレームまで待つ
-            yield return null; //エラー回避用
+            Play(Walk, 0.25f);
+            float end = Time.time + maxSeconds;
+            while (Time.time < end && DistanceToPlayer > meleeRange * 0.8f)
+            {
+                FaceTowards(DirectionToPlayer);
+                Move(transform.forward * walkSpeed);
+                yield return null;
+            }
         }
 
 #if UNITY_EDITOR
-        /// <summary>セットアップツール用（消さないこと）</summary>
+        /// <summary>セットアップツール用</summary>
         public void EditorSetup(BossAttackHitbox bite, BossAttackHitbox[] claws, BossAttackHitbox body)
         {
             biteHitbox = bite;
