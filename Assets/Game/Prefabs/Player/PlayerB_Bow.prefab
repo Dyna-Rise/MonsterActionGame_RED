@@ -165,8 +165,8 @@ MonoBehaviour:
   cameraTransform: {fileID: 0}
   animator: {fileID: 7167594688945681327}
   arrowPrefab: {fileID: -7806372544992149946, guid: 31a32d4e0b02b394da299e7d683dbf53, type: 3}
-  damage: 10
-  chargedDamage: 25
+  damage: 15
+  chargedDamage: 35
   chargeTime: 1
   superArrowPrefab: {fileID: -7806372544992149946, guid: 81ac391914da46d4d822790ba4ac0105, type: 3}
   effectObj: {fileID: 162770279293253243, guid: 05ac25e954144194b8b87d0c1ab13956, type: 3}

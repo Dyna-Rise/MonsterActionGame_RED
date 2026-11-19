@@ -2,24 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 namespace MonsterAction.Battle.Boss
-{
-    /// <summary>
-    /// ボスのサンプル：ナイトメアドラゴン（アルビノ）。ティガレックス風の行動パターン。
-    ///
-    /// 【行動パターン】（★ = 大攻撃：当たるとプレイヤーがダウン）
-    ///   戦闘開始 / HP 半分で怒り   → 咆哮（近くにいるとのけぞる）
-    ///   近い（meleeRange 以内）    → 噛みつき / ひっかき（小攻撃）。ときどきブレス★ / 投擲★
-    ///   中くらい（farRange 以内）  → 突進★（ゆるくホーミング → ドリフトで向き直り → また突進）が多め。ブレス★ / 投擲★
-    ///   遠い                       → ブレス★ / 投擲★ / 突進★
-    ///   どの攻撃も、振りかぶりの間はプレイヤーへ軸合わせ（向き直し）してくる
-    ///   攻撃の後は少し休む（プレイヤーの攻撃チャンス）
-    ///
-    /// 【ボス担当の人へ】
-    /// 自分のボスを作るときは、このファイルをまねして
-    ///   ・ThinkNextAction() … どの行動をするか決める（距離と確率）
-    ///   ・行動ごとのコルーチン … 「向く → モーション → 軸合わせしながら待つ → 判定 ON/OFF → 休む」
-    /// を書けば OK です。
-    /// </summary>
+{  
     public class DragonNightmareBoss : BossBase
     {
         [Header("距離")]
@@ -363,14 +346,5 @@ namespace MonsterAction.Battle.Boss
             }
         }
 
-#if UNITY_EDITOR
-        /// <summary>セットアップツール用</summary>
-        public void EditorSetup(BossAttackHitbox bite, BossAttackHitbox[] claws, BossAttackHitbox body)
-        {
-            biteHitbox = bite;
-            clawHitboxes = claws;
-            bodyHitbox = body;
-        }
-#endif
     }
 }
