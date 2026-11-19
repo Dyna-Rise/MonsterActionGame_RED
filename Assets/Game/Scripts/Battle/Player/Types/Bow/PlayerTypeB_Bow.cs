@@ -1,3 +1,4 @@
+//指示外に🔥→消去で復元可
 using UnityEngine;
 
 namespace MonsterAction.Battle.Player
@@ -28,8 +29,12 @@ namespace MonsterAction.Battle.Player
             base.Awake();   // ← これが無いと Input などが null のまま（消さない）
         }
 
-        //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        [SerializeField] private BowArrow superArrowPrefab; //🔥強い矢→オブジェクト変更
+        //━━━━━━━━━━━━━━━━━━━
+        //🔥追加変数
+        [SerializeField] private BowArrow superArrowPrefab; //強い矢→オブジェクト変更
+        [SerializeField] private GameObject effectObj; //強い矢チャージ中のエフェクト追加
+        private GameObject currentEffect; //エフェクトの実体収納(Destroy用)
+        private bool effectStarted; //エフェクト表示フラグ
 
 
         // ================================================================
@@ -57,6 +62,7 @@ namespace MonsterAction.Battle.Player
                 CrossFade("BowLoad");
                 isHolding = true;
                 holdAnimStarted = false;
+                effectStarted = false; //🔥フラグリセット
                 return true;
             }
             return false; // 何もしなければ false（普段の移動のまま）
@@ -91,28 +97,46 @@ namespace MonsterAction.Battle.Player
 
             if (isHolding)
             {
-                if (TryCancelIntoDodge()) return; //回避キャンセル
+                if (TryCancelIntoDodge())
+                {
+                    DestroyEffect(); //🔥回避時エフェクト消去
+                    return; //回避キャンセル
+                }
+
                 FaceDirection(GetAttackFacingDirection()); //ターゲットに向き続ける
                 if (StateTime >= 0.4f && !holdAnimStarted) //0.4秒経過かつholdAnimStartedじゃなければ
                 {
                     holdAnimStarted = true; //フラグリセット
                     CrossFade("BowHold"); //Holdアニメ再生
                 }
-                if (!Input.AttackHeld) //□ボタン離したら
+
+                if (StateTime >= chargeTime && !effectStarted) //🔥chargeTime以上なら1回だけエフェクト開始
                 {
-                    if (StateTime >= chargeTime)  
-                    {
-                        Fire(damage,true, superArrowPrefab); //chargeTime以上なら強い矢！🔥第3引数追加
-                    }
-                    else if (StateTime >= 0.3)
-                    {
-                        Fire(chargedDamage,false,arrowPrefab); //🔥第3引数追加
-                    }
-                    else ReturnToLocomotion(); //未満なら通常へ戻る
+                    effectStarted = true;
+                    //第4引数のtransform→Playerが移動しても追尾
+                    currentEffect = Instantiate(effectObj, transform.position + Vector3.up * 0.1f, Quaternion.identity, transform);
                 }
-                return; //Hold中に▼ifなるの防止
+
+            if (!Input.AttackHeld) //□ボタン離したら
+            {
+                if (StateTime >= chargeTime)
+                {
+                    Fire(chargedDamage, true, superArrowPrefab); //chargeTime以上なら強い矢！(🔥第3引数追加)
+                }
+                else if (StateTime >= 0.3)
+                {
+                    Fire(damage, false, arrowPrefab); //🔥第3引数追加
+                }
+                else ReturnToLocomotion(); //0.3秒未満なら通常へ戻る
             }
+            return; //Hold中に▼ifなるの防止
+        }
             if (StateTime - fireTime >= 0.5f) ReturnToLocomotion(); //撃った後0.5秒以上経過で通常に戻る
+        }
+
+        void DestroyEffect() //🔥エフェクト消去メソッド
+        {
+            if(currentEffect!=null)Destroy(currentEffect);
         }
 
         // ================================================================
@@ -120,7 +144,7 @@ namespace MonsterAction.Battle.Player
         // ================================================================
 
         /// <summary>矢を放つ。ステップ7では Fire(float power, bool flinch) のように引数を足す</summary>
-        private void Fire(float power,bool flinch,BowArrow prefab) //🔥第3引数追加
+        private void Fire(float power, bool flinch, BowArrow prefab) //🔥第3引数追加
         {
             // TODO：
             //   1. isHolding = false;  fireTime = StateTime;   … もう引いていない・撃った時刻を覚える
@@ -144,15 +168,17 @@ namespace MonsterAction.Battle.Player
             BowArrow arrow = Instantiate(prefab, from, Quaternion.identity);
 
             //飛んで行く向きの条件付け(プレイヤー自身を回転させるのではなく矢の向きを変える)
-            //ifで表現するなら▼
+            //transform.forward:正面(オブジェクト(ここではプレイヤー)のZ軸(青矢印)の向き)
+            //▼2行のifでの言い換え
             //if (IsFocusing) { arrow.Shoot(GetAimDirection(from), damage * AttackMultiplier, gameObject, flinch); }
             //else { arrow.Shoot(transform.forward, damage * AttackMultiplier, gameObject, flinch); }
             Vector3 dir = IsFocusing ? GetAimDirection(from) : transform.forward;
 
             //矢飛ばす:BowArrow.csのShootメソッド発動
-            //引数に(方向,ダメージ量(*攻撃力ｱｯﾌﾟｽｷﾙの倍率),発射元(自分自身))の情報を入れて渡す
-            //transform.forward:正面(オブジェクト(ここではプレイヤー)のZ軸(青矢印)の向き)
+            //引数に(方向,ダメージ量(*攻撃力ｱｯﾌﾟｽｷﾙの倍率),発射元(自分自身),ひるみ有無)の情報を入れて渡す
             arrow.Shoot(dir, power * AttackMultiplier, gameObject, flinch);
+
+            DestroyEffect(); //🔥エフェクト消去
 
             isHolding = false; //フラグリセット
             //撃った後の時間計測用(isHolding後にReturnToLocomotionするため)
@@ -171,6 +197,7 @@ namespace MonsterAction.Battle.Player
             //   isHolding = false;
 
             isHolding = false;
+            DestroyEffect(); //🔥被弾時もエフェクト消去
         }
     }
 }

@@ -728,11 +728,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &917811258 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 7167594688945681327, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
-  m_PrefabInstance: {fileID: 1458029121}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &961739749
 GameObject:
   m_ObjectHideFlags: 0
@@ -1300,6 +1295,9 @@ PrefabInstance:
       propertyPath: actions
       value: 
       objectReference: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+      propertyPath: cameraTransform
+      value: 
+      objectReference: {fileID: 961739753}
     - target: {fileID: 8529482491658978536, guid: a967b64b836b0e145aa22a3b0b541dc5, type: 3}
       propertyPath: m_Name
       value: PlayerB_Bow
